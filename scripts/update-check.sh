@@ -278,3 +278,22 @@ if [[ $FAILED_COUNT -gt 0 ]]; then
 fi
 echo ""
 ok "Done."
+
+# ── Next steps (shown after bootstrap or first run) ─────────────────────────
+if [[ "$BOOTSTRAP" == true ]] || [[ -z "$LOCAL_VERSION" ]]; then
+  header "What's next"
+  echo ""
+  echo "  1. Read AGENTS.md — it contains all workflow instructions"
+  echo "  2. Start a feature workflow:"
+  echo ""
+  echo "     /workflow start <feature-slug>"
+  echo ""
+  echo "  3. Or check available commands:"
+  echo ""
+  echo "     /workflow status    — show current state"
+  echo "     /workflow list      — list all features"
+  echo "     /workflow resume    — pick up someone else's feature"
+  echo ""
+  printf "  ${BOLD}IMPORTANT:${RESET} Read AGENTS.md now to load the full session protocol.\n"
+  echo ""
+fi
