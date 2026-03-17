@@ -23,7 +23,8 @@ err()     { printf "${RED}[err]${RESET}   %s\n" "$*"; }
 header()  { printf "\n${BOLD}${CYAN}── %s ──${RESET}\n" "$*"; }
 
 # ── Constants ────────────────────────────────────────────────────────────────
-REPO_URL_BASE="https://raw.githubusercontent.com/alva-intelligence/agentic-workflows/main"
+# TODO: change back to /main before merging to main
+REPO_URL_BASE="https://raw.githubusercontent.com/alva-intelligence/agentic-workflows/agentic"
 CURL_TIMEOUT=5
 BOOTSTRAP=false
 
