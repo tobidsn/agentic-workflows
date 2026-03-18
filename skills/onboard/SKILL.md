@@ -164,16 +164,37 @@ Neither is required. Workflow works without them.
 command -v nix &>/dev/null && echo "✓ Nix installed: $(nix --version)" || echo "✗ Nix not found"
 ```
 
-### 2.2 If Nix is NOT installed — install it
+### 2.2 If Nix is NOT installed — **STOP, wait for user**
 
+Nix requires `sudo` and an interactive terminal. The agent CANNOT install it headlessly.
+
+Tell the user (use the ask tool):
+
+> "Nix is not installed. It requires sudo and must be run in your terminal directly.
+> Please run this command in a separate terminal:
+>
+> ```
+> curl -L https://nixos.org/nix/install | sh
+> ```
+>
+> After installation, restart your terminal and run `nix --version` to confirm.
+> **Let me know when Nix is installed and ready.**"
+
+**DO NOT proceed to the next step.** Wait for the user to confirm Nix is installed. Use the ask tool to ask:
+
+> "Have you installed Nix and restarted your terminal?"
+> - Yes, Nix is installed
+> - Not yet, I need more time
+> - I need help with the installation
+
+Only continue when user confirms "Yes". If "Not yet", wait. If "Need help", troubleshoot.
+
+After confirmation, verify:
 ```bash
-curl -L https://nixos.org/nix/install | sh
+command -v nix &>/dev/null && echo "✓ Nix installed: $(nix --version)" || echo "✗ Still not found"
 ```
 
-After installation, restart the terminal/shell and verify:
-```bash
-nix --version
-```
+If still not found, do NOT continue. Ask the user to check their shell path.
 
 ### 2.3 Enter the Nix dev shell
 
