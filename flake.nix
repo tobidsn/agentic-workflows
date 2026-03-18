@@ -19,29 +19,28 @@
           name = "frndos";
 
           buildInputs = with pkgs; [
-            # PHP + Composer
-            php82
-            php82Packages.composer
+            # PHP + Composer (Laravel 12)
+            php85
+            php85Packages.composer
 
             # JavaScript / TypeScript
             bun
-            nodejs_20
+            nodejs_22
 
             # Python + uv
-            python311
+            python312
             uv
 
             # Databases
             postgresql_16
             clickhouse
-
-            # Cache
             redis
 
             # Tools
+            curl
             gh
             git
-            ngrok
+            jq
           ];
 
           shellHook = ''
