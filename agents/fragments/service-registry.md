@@ -32,17 +32,19 @@
 
 ### Health Check Endpoints (EXACT — do NOT guess)
 
-| Service | URL | Expected Response |
-|---------|-----|-------------------|
-| API | `curl -sf http://localhost:9191/api/ping` | `{"ping":"pong"}` |
-| Frontend | `curl -sf http://localhost:3000` | 200 OK (HTML) |
+| Service | Check Command | Healthy If |
+|---------|--------------|-----------|
+| API | `curl -so /dev/null -w "%{http_code}" http://localhost:9191/` | Any 2xx or 3xx (try `/api/ping` first, fall back to `/`) |
+| Frontend | `curl -sf http://localhost:3000` | 200 OK |
 | AI Service | `curl -sf http://localhost:8000/health` | 200 OK |
-| Data Service | `curl -sf http://localhost:9999/health` | 200 OK (may require auth — a 401 response means the service IS running) |
+| Data Service | `curl -so /dev/null -w "%{http_code}" http://localhost:9999/api/v1/health/` | 200 OR 401 (401 = running but auth-protected) |
 | PostgreSQL | `pg_isready -h localhost -p 5432` | exit 0 |
-
 | Redis | `redis-cli ping` | "PONG" |
 
-**IMPORTANT:** The API does NOT have `/health`. Use `/api/ping` instead. Do NOT guess health endpoints — use the exact URLs above.
+**IMPORTANT:**
+- The API may not have `/api/ping` on all branches. Try it first, fall back to `/` (root). Any HTTP response = running.
+- The Data Service health endpoint is auth-protected. A **401 response means the service IS running** — treat it as healthy.
+- Do NOT guess health endpoints — use the URLs above.
 
 ### Environment Files
 

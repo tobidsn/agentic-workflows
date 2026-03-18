@@ -71,7 +71,9 @@ kill_ports() {
 # ── Stop ─────────────────────────────────────────────────────────────────────
 stop_all() {
   echo -e "\n${BOLD}Stopping all services...${NC}\n"
-  for name in api api-queue web ai-service data-service; do
+
+  # 1. Stop tracked PIDs
+  for name in api api-queue web ai-service data-service mailhog; do
     local pid
     pid=$(read_pid "$name")
     if is_running "$pid"; then
@@ -79,12 +81,30 @@ stop_all() {
       rm -f "$PID_DIR/$name.pid"
     fi
   done
+
+  # 2. Kill anything still on our ports (catches orphaned processes)
+  for port in 9191 3000 8000 9999 1025 8025; do
+    local pid
+    pid=$(lsof -ti :"$port" 2>/dev/null || true)
+    if [[ -n "$pid" ]]; then
+      kill -9 "$pid" 2>/dev/null && log_ok "Killed orphaned process on port $port (PID $pid)" || true
+    fi
+  done
+
+  # 3. Stop Docker Mailhog if running
+  docker rm -f frndos-mailhog 2>/dev/null || true
+
+  # 4. Clean up stale PID files
+  rm -f "$PID_DIR"/*.pid 2>/dev/null
+
+  echo ""
+  log_ok "All services stopped."
 }
 
 # ── Status ───────────────────────────────────────────────────────────────────
 show_status() {
   echo -e "\n${BOLD}Service Status${NC}\n"
-  for name in api api-queue web ai-service data-service; do
+  for name in api api-queue web ai-service data-service mailhog; do
     local pid
     pid=$(read_pid "$name")
     if is_running "$pid"; then
@@ -96,10 +116,19 @@ show_status() {
   echo ""
 
   echo -e "${BOLD}Health Checks${NC}\n"
-  curl -sf http://localhost:9191/api/ping &>/dev/null && log_ok "API (9191)" || log_warn "API (9191) — down"
+  # API: try /api/ping first, fall back to / (any response = running)
+  local api_code
+  api_code=$(curl -so /dev/null -w "%{http_code}" http://localhost:9191/api/ping 2>/dev/null || echo "000")
+  [[ "$api_code" != "000" ]] && log_ok "API (9191) — HTTP $api_code" || log_warn "API (9191) — down"
+
   curl -sf http://localhost:3000 &>/dev/null && log_ok "Frontend (3000)" || log_warn "Frontend (3000) — down"
   curl -sf http://localhost:8000/health &>/dev/null && log_ok "AI Service (8000)" || log_warn "AI Service (8000) — down"
-  curl -sf http://localhost:9999/health &>/dev/null || curl -sf http://localhost:9999/ &>/dev/null && log_ok "Data Service (9999)" || log_warn "Data Service (9999) — down"
+
+  # Data Service: 401 = auth-protected but running
+  local data_code
+  data_code=$(curl -so /dev/null -w "%{http_code}" http://localhost:9999/api/v1/health/ 2>/dev/null || echo "000")
+  [[ "$data_code" == "200" || "$data_code" == "401" ]] && log_ok "Data Service (9999) — HTTP $data_code" || log_warn "Data Service (9999) — down"
+
   pg_isready -h localhost -p 5432 &>/dev/null && log_ok "PostgreSQL (5432)" || log_warn "PostgreSQL (5432) — down"
   redis-cli ping &>/dev/null && log_ok "Redis" || log_warn "Redis — down"
 }
@@ -187,6 +216,18 @@ start_all() {
     log_warn "Skipping Data Service (missing dir or .env)"
   fi
 
+  # Mailhog (email testing for API)
+  if command -v mailhog &>/dev/null; then
+    (mailhog > "$LOG_DIR/mailhog.log" 2>&1) &
+    save_pid "mailhog" $!
+    log_ok "Mailhog started on :1025 (SMTP) / :8025 (UI)"
+  elif command -v docker &>/dev/null; then
+    docker run -d --name frndos-mailhog -p 1025:1025 -p 8025:8025 mailhog/mailhog > /dev/null 2>&1 && \
+      log_ok "Mailhog started via Docker on :1025 / :8025" || log_warn "Skipping Mailhog (Docker failed)"
+  else
+    log_warn "Skipping Mailhog (not installed — brew install mailhog OR use Docker)"
+  fi
+
   echo ""
   echo -e "${BOLD}All available services started.${NC}"
   echo ""
@@ -195,6 +236,7 @@ start_all() {
   echo "    Frontend      → http://localhost:3000"
   echo "    AI Service    → http://localhost:8000"
   echo "    Data Service  → http://localhost:9999"
+  echo "    Mailhog UI    → http://localhost:8025"
   echo ""
   echo "  Logs:    tail -f $LOG_DIR/<service>.log"
   echo "  Status:  ./run-all.sh --status"
