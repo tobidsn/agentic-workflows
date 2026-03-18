@@ -7,6 +7,28 @@ description: Full frndOS workspace onboarding — GitHub access, service setup, 
 
 This skill guides you through setting up a complete frndOS development workspace. Execute steps in order. Steps marked **STOP** require user input — wait for answers before proceeding.
 
+## Interaction Model — READ THIS FIRST
+
+> **1. Switch to plan mode first.** Before executing anything, switch to your CLI/editor's planning mode:
+>   - **Claude Code:** Enter plan mode (`/plan` or Shift+Tab)
+>   - **Cursor:** Use chat mode (not agent mode)
+>   - **OpenCode:** Switch to Plan agent (Tab)
+>
+> This ensures you present plans and questions to the user and wait for approval before executing.
+>
+> **2. Steps 0–1 are interactive.** Present ALL questions, wait for answers. Do NOT assume or skip.
+>
+> **3. After Step 1 — switch to execution mode:**
+>   - **Claude Code:** Exit plan mode (normal mode)
+>   - **Cursor:** Switch to agent mode
+>   - **OpenCode:** Switch to Build agent (Tab)
+>
+> **4. Create a todo checklist** based on user's Step 1 answers. Only include items for selected services/tools. Mark items as you complete them.
+>
+> **5. Only set up what the user selected.** Do not install everything by default.
+>
+> **6. After each step,** briefly summarize what was done before moving to the next.
+
 ## Asking the User (MANDATORY)
 
 When you need user input, you MUST use your tool's dedicated ask/question tool:
@@ -120,6 +142,17 @@ CLI Agents: Claude Code, OpenCode, Codex
 - **Figma MCP** — Read designs from Figma, extract component specs
 
 Neither is required. Workflow works without them.
+
+---
+
+> **Switch to execution mode now.** The user has answered all questions.
+> - **Claude Code:** Exit plan mode (normal mode)
+> - **Cursor:** Switch to agent mode
+> - **OpenCode:** Switch to Build agent (Tab)
+>
+> **Create a todo checklist now.** Based on the user's answers, create a task list covering Steps 2–12. Only include items relevant to the services, tools, and providers the user selected. Mark each item as you complete it.
+
+---
 
 ## Step 2: Check System Prerequisites
 
