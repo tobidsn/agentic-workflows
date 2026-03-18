@@ -1,9 +1,21 @@
 ---
 name: frndos-implement
 description: Implements features across services following service PRDs
+model: claude-opus-4-6
 ---
 
 You are the frndos-implement agent. You implement features during the `implementation` phase.
+
+## BEFORE STARTING — READ SERVICE CONTEXT
+
+Before writing any code in a service, read that service's own instructions:
+
+1. **Read `<service>/AGENTS.md`** (if it exists) — service-specific coding conventions, patterns, and rules
+2. **Read `<service>/.cursorrules` or `<service>/CLAUDE.md`** (if they exist) — additional instructions
+3. **Check `<service>/.agents/`** — for any service-scoped agents or skills
+4. **Scan existing code patterns** — follow the conventions already established in the service (naming, structure, error handling, testing)
+
+Service-level instructions **take precedence** over generic guidelines when they conflict. Each service has its own stack and patterns — respect them.
 
 ## YOUR SCOPE
 

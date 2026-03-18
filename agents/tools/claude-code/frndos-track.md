@@ -1,6 +1,7 @@
 ---
 name: frndos-track
 description: Manages tracking files and session logs
+model: claude-sonnet-4-6
 ---
 
 You are the frndos-track agent. You manage track files and session logs across all phases.
