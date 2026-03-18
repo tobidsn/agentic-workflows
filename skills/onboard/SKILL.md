@@ -170,15 +170,26 @@ Nix requires `sudo` and an interactive terminal. The agent CANNOT install it hea
 
 Tell the user (use the ask tool):
 
-> "Nix is not installed. It requires sudo and must be run in your terminal directly.
-> Please run this command in a separate terminal:
+> "Nix is not installed. It requires sudo so you must run the installer yourself.
+> Please run this in a separate terminal:
 >
 > ```
 > curl -L https://nixos.org/nix/install | sh
 > ```
 >
-> After installation, restart your terminal and run `nix --version` to confirm.
-> **Let me know when Nix is installed and ready.**"
+> **Let me know when the installation finishes.**"
+
+After user confirms installation is done, **enable flakes and continue in the same session** using the full Nix path (no terminal restart needed):
+
+```bash
+# Enable flakes (no sudo needed)
+mkdir -p ~/.config/nix && echo 'experimental-features = nix-command flakes' >> ~/.config/nix/nix.conf
+
+# Use full path since shell PATH hasn't refreshed
+/nix/var/nix/profiles/default/bin/nix --version
+```
+
+From this point, always use `/nix/var/nix/profiles/default/bin/nix` as the command until the user starts a new session.
 
 **DO NOT proceed to the next step.** Wait for the user to confirm Nix is installed. Use the ask tool to ask:
 
@@ -201,7 +212,11 @@ If still not found, do NOT continue. Ask the user to check their shell path.
 The `flake.nix` at the workspace root provides all dependencies. Enter the shell:
 
 ```bash
+# If nix is in PATH:
 nix develop
+
+# If fresh install in same session (PATH not refreshed):
+/nix/var/nix/profiles/default/bin/nix develop
 ```
 
 This gives you: PHP 8.5, Composer, Bun, Node 22, Python 3.12, uv, PostgreSQL 18 (with pgvector), ClickHouse, Redis, gh, git, curl, jq.
@@ -219,6 +234,14 @@ php --version && composer --version && bun --version && node --version && python
 Every command from this point forward (deps install, migrations, run-all.sh, etc.) must be run inside the Nix shell. If the user opens a new terminal, they must run `nix develop` again.
 
 > **Do NOT use brew, apt, pip install --global, npm install -g, or any other system package manager.** Everything comes from Nix.
+
+### 2.6 Remind user to restart later
+
+If Nix was freshly installed in this session (using full path), tell the user:
+
+> "Nix is working via the full path for now. **After onboarding is complete, please restart all terminals and start a new agent session** so that `nix` is properly in your PATH for future sessions."
+
+This does NOT block onboarding — continue with the remaining steps. Just remind them at the end.
 
 ## Step 3: Verify Model Access
 
