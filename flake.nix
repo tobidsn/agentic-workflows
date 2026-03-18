@@ -19,7 +19,7 @@
           name = "frndos";
 
           buildInputs = with pkgs; [
-            # PHP + Composer (Laravel 12)
+            # PHP + Composer (Laravel 13)
             php85
             php85Packages.composer
 
