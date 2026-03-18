@@ -7,6 +7,49 @@ description: Full frndOS workspace onboarding — GitHub access, service setup, 
 
 This skill guides you through setting up a complete frndOS development workspace. Execute steps in order. Steps marked **STOP** require user input — wait for answers before proceeding.
 
+## Onboarding State
+
+Throughout onboarding, maintain a `.onboard-state.json` file at the workspace root. **Write/update this file after each step.**
+
+```json
+{
+  "status": "in_progress|completed",
+  "services": ["api", "web", "ai-service", "data-service"],
+  "tools": ["claude-code", "cursor"],
+  "steps": {
+    "github_access": "completed|skipped|pending",
+    "questionnaire": "completed|pending",
+    "prerequisites": "completed|pending",
+    "model_access": "completed|skipped|pending",
+    "clone_repos": "completed|pending",
+    "install_deps": "completed|pending",
+    "env_files": "completed|partial|pending",
+    "db_setup": "completed|skipped|pending",
+    "run_all_sh": "completed|pending",
+    "docs_structure": "completed|pending",
+    "editor_tooling": "completed|pending",
+    "community_skills": "completed|pending",
+    "mcp_servers": "completed|pending",
+    "verify": "completed|pending"
+  },
+  "env_status": {
+    "api": "completed|pending",
+    "web": "completed|pending",
+    "ai-service": "completed|pending",
+    "data-service": "completed|pending"
+  },
+  "skipped_reasons": {}
+}
+```
+
+The workflow engine reads this file. **`/workflow start` will block** if any of these are not resolved:
+- `env_files` is not `"completed"` for ALL selected services
+- `db_setup` is not `"completed"` (required for API)
+- `clone_repos` is not `"completed"`
+- `install_deps` is not `"completed"`
+
+The agent must remind the user what's missing and how to fix it.
+
 ## Step 0: Verify GitHub Access
 
 ```bash
@@ -135,23 +178,57 @@ Only clone services the user selected. Skip if directory already exists.
 
 ## Step 5: Install Dependencies
 
-Per selected service (skip if user doesn't have .env):
+Per selected service, install dependencies. **Always install deps even if user doesn't have .env yet** — deps are needed regardless.
 
 - **API:** `cd api && composer install && cp .env.example .env && php artisan key:generate`
 - **Frontend:** `cd web && bun install && cp .env.example .env.local`
 - **AI Service:** `cd ai-service && pip install uv && uv venv && uv pip install -r requirements.txt && cp .env.example .env`
 - **Data Service:** `cd data-service && python3 -m venv venv && pip install -r requirements.txt && cp .env.example .env`
 
-Remind user to replace .env files with real credentials from contacts in Step 1.
+Update `.onboard-state.json`: set `steps.install_deps` to `"completed"`.
 
-## Step 6: Database Setup — **STOP, ask user**
+## Step 6: Set Up Environment Files — **STOP, ask for EACH service**
+
+The `.env.example` files were copied in Step 5, but they contain placeholder values. **Each service needs real credentials to run.**
+
+For EACH selected service, ask the user:
+
+> "Do you have the real `.env` file for **[service]**? You need it from **[contact]**."
+
+| Service | Env File | What User Must Do | Contact |
+|---------|---------|-------------------|---------|
+| API | `api/.env` | Replace `api/.env` with real credentials | arhen |
+| Frontend | `web/.env.local` | Replace `web/.env.local` with real credentials | fahrizky, daffa |
+| AI Service | `ai-service/.env` | Replace `ai-service/.env` with real credentials | rifki |
+| Data Service | `data-service/.env` | Replace `data-service/.env` with real credentials | kemal, iru |
+
+**For each service, one of:**
+- **"I have it"** → Ask user to drop/paste the file, or confirm it's already in place. Verify the file exists and is NOT the example: check it doesn't contain `your-secret-here` or `CHANGE_ME` placeholder patterns. Mark `env_status.<service>` as `"completed"`.
+- **"I don't have it yet"** → Mark `env_status.<service>` as `"pending"`. Tell user who to contact. **Continue onboarding** — don't block here, but record it.
+
+After checking all services:
+- If ALL selected services have real .env files → set `steps.env_files` to `"completed"`
+- If ANY are pending → set `steps.env_files` to `"partial"` and list what's missing
+
+**The user can continue onboarding with partial .env setup, but `/workflow start` will block until ALL are completed.**
+
+## Step 7: Database Setup — **STOP, ask user**
 
 Ask: "Do you have a PostgreSQL database dump (.dump file) for local development?"
 
-- **Yes:** Help restore: `createdb frnd && psql frnd < path/to/dump.dump`
-- **No:** "Contact arhen for a sanitized dev dump. The API won't work without it."
+- **"Yes, I have the dump file":**
+  1. Ask for the file path (e.g., `~/Downloads/frnd-dev.dump`)
+  2. Create the database: `createdb frnd` (or whatever DB name is in `api/.env`)
+  3. Restore: `pg_restore -d frnd path/to/dump.dump` or `psql frnd < path/to/dump.dump`
+  4. Run migrations: `cd api && php artisan migrate`
+  5. Mark `steps.db_setup` as `"completed"`
 
-The dump is REQUIRED for API. Don't skip this step.
+- **"No, I don't have it":**
+  1. Tell user: "Contact **arhen** for a sanitized dev database dump. The API needs it to function."
+  2. Mark `steps.db_setup` as `"skipped"` with reason
+  3. **Continue onboarding** — don't block here
+
+**The DB dump is REQUIRED for API.** `/workflow start` will block if `db_setup` is not `"completed"` and the user selected the API service.
 
 ## Step 7: Create run-all.sh
 
@@ -240,13 +317,53 @@ Configure MCPs in the correct file for the user's selected tool(s). For service-
 
 ## Step 12: Verify & Complete
 
-1. Start services: `./run-all.sh --check` (preflight) then `./run-all.sh`
-2. Run health checks for each service
-3. Summarize what was set up
+1. Run preflight: `./run-all.sh --check`
+2. If all checks pass, try starting: `./run-all.sh`
+3. Run health checks for each selected service
+4. Update `.onboard-state.json`: set `steps.verify` to `"completed"`
 
-Tell user:
+**Check for incomplete items.** Read `.onboard-state.json` and report:
+
+If ALL critical steps are completed:
 ```
-Workspace is ready! Your next step:
+Onboarding complete! Your workspace is fully set up.
+
+Next step:
   /workflow start <feature-slug>    — begin a new feature
   /workflow status                  — check current state
 ```
+Set `status` to `"completed"`.
+
+If ANY critical steps are pending/skipped:
+```
+Onboarding mostly done, but some items need attention before you can start working:
+
+  Missing .env files:
+    - api/.env — contact arhen
+    - ai-service/.env — contact rifki
+
+  Database:
+    - DB dump not restored — contact arhen for a sanitized dev dump
+
+You can complete these later. When ready, the agent will verify automatically.
+To re-check: /onboard verify
+```
+Keep `status` as `"in_progress"`.
+
+## /onboard verify
+
+If the user runs `/onboard verify` (or any agent checks onboarding state):
+
+1. Read `.onboard-state.json`
+2. For each pending env file, check if the real file now exists (not a placeholder)
+3. For pending db_setup, check if `psql -h localhost -p 5432 -d frnd -c "SELECT 1"` succeeds
+4. Update the state file with any newly completed items
+5. Report what's still missing
+
+## /onboard resume
+
+If the user runs `/onboard resume`:
+
+1. Read `.onboard-state.json`
+2. Find the first step that is `"pending"` or `"skipped"`
+3. Continue onboarding from that step

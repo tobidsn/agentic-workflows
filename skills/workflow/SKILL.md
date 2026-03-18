@@ -37,14 +37,29 @@ Show ALL active features with their phases.
 Start a new feature workflow.
 
 **Steps:**
-1. Read `.workflow-state.json` (create if doesn't exist)
-2. Check that `<slug>` doesn't already exist in features
-3. Create feature entry with phase: "prd_creation"
-4. Set `active_feature` to `<slug>`
-5. Set `phase_entered` to current timestamp
-6. Ask user for worker name if not set
-7. Save state
-8. Inform user: "Feature `<slug>` started. Phase: prd_creation. Delegating to frndos-prd."
+1. **Check onboarding state first.** Read `.onboard-state.json`:
+   - If file doesn't exist and no service directories → BLOCK: "Run `/onboard` first."
+   - If `status` is `"in_progress"`, check critical steps:
+     - `steps.env_files` must be `"completed"` (all services have real .env)
+     - `steps.db_setup` must be `"completed"` (if API service is selected)
+     - `steps.clone_repos` must be `"completed"`
+     - `steps.install_deps` must be `"completed"`
+   - If ANY critical step is missing → BLOCK and list what's needed:
+     ```
+     Cannot start workflow. Onboarding is incomplete:
+       - api/.env is missing — contact arhen
+       - Database not restored — contact arhen for dev dump
+     Run `/onboard resume` to complete setup.
+     ```
+   - If `status` is `"completed"` → proceed
+2. Read `.workflow-state.json` (create if doesn't exist)
+3. Check that `<slug>` doesn't already exist in features
+4. Create feature entry with phase: "prd_creation"
+5. Set `active_feature` to `<slug>`
+6. Set `phase_entered` to current timestamp
+7. Ask user for worker name if not set
+8. Save state
+9. Inform user: "Feature `<slug>` started. Phase: prd_creation. Delegating to frndos-prd."
 
 ### `/workflow next`
 Transition to the next phase (if gate conditions are met).

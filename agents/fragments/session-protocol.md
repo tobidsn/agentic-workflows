@@ -7,14 +7,24 @@
 Check the workspace to determine what's needed:
 
 1. **No service directories** (none of `api/`, `web/`, `ai-service/`, `data-service/` exist):
-   → This is a fresh workspace. Tell user: "This workspace hasn't been set up yet. Run `/onboard` to configure your development environment."
+   → Fresh workspace. Tell user: "This workspace hasn't been set up yet. Run `/onboard` to configure your development environment."
    → Do NOT proceed with workflow commands until onboarding is complete.
 
-2. **Service directories exist but NO `.workflow-state.json`**:
-   → Workspace is set up but no features started. Proceed to Step 1, then welcome user with available commands (`/workflow start`, `/workflow list`).
+2. **`.onboard-state.json` exists and `status` is `"in_progress"`**:
+   → Onboarding was started but not fully completed. Check what's missing:
+   - Read `env_status` — are all selected services' .env files present?
+   - Read `steps.db_setup` — is the database restored?
+   - If critical items are missing, tell user:
+     "Onboarding is incomplete. Missing: [list items]. Run `/onboard resume` to continue, or `/onboard verify` to re-check."
+   - If user wants to proceed anyway with `/workflow start`, **BLOCK** and explain what will fail without the missing items.
 
-3. **`.workflow-state.json` exists**:
-   → Workspace is configured with active features. Proceed normally through all steps.
+3. **`.onboard-state.json` exists and `status` is `"completed"`** (or no `.onboard-state.json` but service directories exist):
+   → Workspace is set up. Check for `.workflow-state.json`:
+   - If it exists → proceed normally with active features
+   - If it doesn't → welcome user with `/workflow start`, `/workflow list`
+
+4. **`.workflow-state.json` exists**:
+   → Proceed normally through all steps.
 
 ### Step 1: Check for instruction updates
 
