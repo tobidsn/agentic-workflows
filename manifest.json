@@ -87,6 +87,16 @@
       "install_to": ".agents/skills/onboard/SKILL.md",
       "type": "skill"
     },
+    "skills/onboard/references/run-all-template.sh": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agents/skills/onboard/references/run-all-template.sh",
+      "type": "reference"
+    },
+    "skills/onboard/references/mcp-configs.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agents/skills/onboard/references/mcp-configs.md",
+      "type": "reference"
+    },
     "skills/workflow/SKILL.md": {
       "sha256": "PLACEHOLDER",
       "install_to": ".agents/skills/workflow/SKILL.md",
