@@ -1,102 +1,133 @@
-# agentic-workflows
+# frndOS Agentic Workflows
 
-Instruction set and orchestration layer for frndOS AI agents. This repository is the single source of truth for agent definitions, workflow phases, skill files, templates, and conventions that Claude Code agents consume when working inside the frnd workspace.
+> **Version:** 2.0.0 | **Maintainer:** Alva Intelligence Engineering
 
-## How it works
+---
 
-Each frnd workspace (e.g. `frnd-app`) installs a local copy of the files from this repo into `.agentic-workflows/` and `.claude/`. A lightweight update mechanism keeps those copies in sync:
+## For LLM Agents — Read This First
 
-1. **You edit files** in this repo (agents, skills, fragments, templates, workflow configs).
-2. **Push to `main`**. The `update-manifest` GitHub Action runs automatically.
-3. **The Action** computes SHA-256 hashes for every distributable file, bumps the patch version in `VERSION`, and commits the updated `manifest.json` back to the repo.
-4. **In the workspace**, `scripts/update-check.sh` compares local hashes against the manifest. If any file is outdated, it pulls the new version.
-5. **`scripts/generate-agents.sh`** assembles the final `AGENTS.md` from fragments and the template, so agents always operate with the latest conventions.
+> **If you are an LLM agent and a user has pointed you at this repository, follow the instructions below.**
 
-The commit message from the Action contains `[manifest]`, which causes the Action to skip itself on the next push -- preventing infinite loops.
+### Step 1: Welcome the user
 
-## Repository structure
+Display this welcome message:
+
+```
+Welcome to frndOS Agentic Workflows!
+
+frndOS is a multi-service platform built by Alva Intelligence. This system sets up
+your development workspace and guides you through a structured feature development
+workflow — from PRD creation to wireframing, implementation, and PR submission.
+
+What gets installed:
+  - 7 phase-scoped AI agents (orchestra, prd, wireframe, splitter, implement, pr, track)
+  - 5 skills (/onboard, /workflow, /prd, /prd-split, /wireframe)
+  - A 10-phase workflow state machine with gate enforcement
+  - Auto-updating instruction system (stays in sync with team changes)
+  - Templates for PRDs, service PRDs, and track files
+
+Supported tools: Claude Code, Cursor, OpenCode (and any tool supporting SKILL.md)
+```
+
+### Step 2: Ask for confirmation
+
+Ask the user:
+
+> **Would you like to set up frndOS and start the agentic workflow?** (yes/no)
+
+**Wait for the user's response.** Do NOT proceed without explicit confirmation.
+
+### Step 3: If yes — run the bootstrap
+
+Execute the bootstrap script to install all workflow files into the current workspace:
+
+```bash
+curl -sL "https://raw.githubusercontent.com/alva-intelligence/agentic-workflows/agentic/scripts/update-check.sh" \
+  -o /tmp/aw-update-check.sh && bash /tmp/aw-update-check.sh --bootstrap
+```
+
+This downloads all agents, skills, fragments, templates, and workflow configs into the workspace and generates `AGENTS.md`.
+
+### Step 4: After bootstrap — read AGENTS.md and follow the session protocol
+
+1. Read the generated `AGENTS.md` file in the workspace root
+2. Follow the **Session Start Protocol** inside it
+3. The protocol will detect that this is a fresh workspace and direct the user to run `/onboard`
+4. `/onboard` walks through the full workspace setup: GitHub access, service selection, cloning, dependencies, .env files, database, editor config, and MCP setup
+
+### Flow summary
+
+```
+User points agent at this repo
+  → Agent reads README.md (this file)
+  → Agent shows welcome message
+  → Agent asks: "Ready to set up?" (yes/no)
+  → If yes: bootstrap → AGENTS.md → session protocol → /onboard
+  → After onboarding: /workflow start <feature-slug>
+```
+
+---
+
+## For Humans — Repository Reference
+
+This repo is the single source of truth for frndOS AI agent instructions. It is NOT cloned into workspaces — instead, individual files are downloaded and cached locally via the auto-update mechanism.
+
+### How auto-update works
+
+1. Edit files in this repo → push to `main`
+2. GitHub Action computes SHA-256 hashes, bumps VERSION, updates `manifest.json`
+3. On next agent session, `update-check.sh` compares local hashes vs manifest
+4. Only changed files are downloaded — fragments, agents, skills, etc.
+5. If fragments changed, `AGENTS.md` is regenerated automatically
+
+### Repository structure
 
 ```
 agentic-workflows/
   agents/
-    fragments/          # Markdown fragments assembled into AGENTS.md
+    fragments/            # Markdown fragments assembled into AGENTS.md
     tools/
-      claude-code/      # Agent definition files for Claude Code
-    AGENTS.md.template  # Template that includes fragment references
+      claude-code/        # Agent definitions (.md) for Claude Code
+      cursor/             # Agent definitions (.mdc) for Cursor
+      opencode/           # Agent definitions (.md) for OpenCode
+    AGENTS.md.template    # Template with {{FRAGMENT:...}} markers
   scripts/
-    update-check.sh     # Pulls updates from this repo into a workspace
-    generate-agents.sh  # Assembles AGENTS.md from fragments + template
+    update-check.sh       # Downloads updates from this repo
+    generate-agents.sh    # Assembles AGENTS.md from fragments
   skills/
-    workflow-manager/   # /workflow slash command skill
-    prd-creator/        # /prd slash command skill
-    prd-splitter/       # /prd-split slash command skill
-    wireframe-builder/  # /wireframe slash command skill
+    onboard/              # /onboard — full workspace setup
+    workflow/              # /workflow — state machine management
+    prd/                   # /prd — PRD creation
+    prd-split/             # /prd-split — split PRD into service PRDs
+    wireframe/             # /wireframe — wireframe builder
   templates/
-    prd/                # PRD document templates
-    tracks/             # Track/task breakdown templates
+    prd/                   # PRD document templates
+    tracks/                # Track file templates
   workflow/
-    phases.json         # Workflow phase definitions
-    gates.json          # Quality gate definitions
-    state-schema.json   # Schema for .workflow-state.json
+    phases.json            # 10-phase state machine definitions
+    gates.json             # Gate conditions per phase transition
+    state-schema.json      # JSON schema for .workflow-state.json
   wireframe-scaffold/
-    layout.tsx          # Scaffold for (dashboard)/workflows/layout.tsx
-    page.tsx            # Scaffold for (dashboard)/workflows/page.tsx
-  manifest.json         # File registry with SHA-256 hashes and install paths
-  VERSION               # Current version (semver, patch auto-bumped)
-  flake.nix             # Nix flake for reproducible dev environments
-  .github/
-    workflows/
-      update-manifest.yml  # GitHub Action that updates manifest on push
+    layout.tsx             # Scaffold for /workflows route
+    page.tsx               # Scaffold for /workflows index
+  manifest.json            # File registry with SHA-256 hashes
+  VERSION                  # Semver (patch auto-bumped by CI)
+  flake.nix                # Nix flake for dev environment
 ```
 
-## Making changes
+### Making changes
 
-1. Clone this repo (or edit in the GitHub UI).
-2. Edit the relevant file -- agent definitions, fragments, skills, templates, etc.
-3. Push to `main`.
-4. The GitHub Action bumps `VERSION`, recomputes all SHA-256 hashes, and commits the updated `manifest.json`.
-5. Next time an agent runs `update-check.sh` in a workspace, it picks up the new files.
+1. Edit the file (agents, fragments, skills, templates, etc.)
+2. Push to `main`
+3. GitHub Action auto-updates `manifest.json` and `VERSION`
+4. Everyone's agent picks up changes on next session
 
-If you add a **new file** that should be distributed, you must also add an entry to `manifest.json` under the `files` key with:
-- The file path (relative to repo root) as the key
-- `sha256`: set to `"PLACEHOLDER"` (the Action will fill it in)
-- `install_to`: the destination path relative to the workspace root
-- `type`: one of `fragment`, `template`, `script`, `skill`, `agent`, `workflow`, `config`
+To add a new distributable file, add an entry to `manifest.json` with:
+- File path as key, `sha256: "PLACEHOLDER"`, `install_to` path, and `type`
 
-## Manual testing
+### Key conventions
 
-To test changes locally before pushing:
-
-```bash
-# From the frnd workspace root:
-
-# Check for updates against the remote manifest
-bash .agentic-workflows/scripts/update-check.sh
-
-# Regenerate AGENTS.md from current fragments
-bash .agentic-workflows/scripts/generate-agents.sh
-```
-
-You can also run the hash computation locally to verify:
-
-```bash
-# From the agentic-workflows repo root:
-for f in $(jq -r '.files | keys[]' manifest.json); do
-  echo "$f: $(shasum -a 256 "$f" | awk '{print $1}')"
-done
-```
-
-## Version scheme
-
-Versions follow `MAJOR.MINOR.PATCH`:
-- **MAJOR** -- breaking changes to agent protocol or workflow state schema
-- **MINOR** -- new agents, skills, or workflow phases
-- **PATCH** -- auto-bumped on every push to `main` by the GitHub Action
-
-The current version lives in the `VERSION` file and is mirrored in `manifest.json`.
-
-## Key conventions
-
-- Commit messages containing `[skip ci]` or `[manifest]` will not trigger the update Action.
-- All distributable files must be registered in `manifest.json` to be synced.
-- Wireframe scaffolds in `wireframe-scaffold/` are copied to workspaces during the `/wireframe create` onboarding step, not via the normal manifest sync.
+- Commit messages with `[skip ci]` or `[manifest]` skip the update Action
+- All distributable files must be registered in `manifest.json`
+- Skills use the universal `.agents/skills/` path (symlinked to `.claude/`, `.cursor/`, `.opencode/`)
+- Agents use `.agents/agents/` (similarly symlinked)
