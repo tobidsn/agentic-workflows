@@ -18,17 +18,31 @@
 | AI Service | rifki | rifki |
 | Data Service | kemal, iru | kemal, iru |
 
-### Health Check Endpoints
+### Start Commands (EXACT — do NOT guess)
 
-| Service | URL | Expected |
-|---------|-----|----------|
-| API | http://localhost:9191/health | 200 OK |
-| Frontend | http://localhost:3000 | 200 OK |
-| AI Service | http://localhost:8000/health | 200 OK |
-| Data Service | http://localhost:9999/health | 200 OK |
+| Service | Command | Working Directory | Entry Point |
+|---------|---------|-------------------|-------------|
+| API | `php artisan serve --port=9191` | `api/` | Laravel (artisan) |
+| API Queue | `php artisan queue:work database --timeout=3000 --tries=5 --queue=high,low,default,subscriptions` | `api/` | Laravel queue worker |
+| Frontend | `bun dev` | `web/` | Next.js dev server |
+| AI Service | `source .venv/bin/activate && fastapi dev` | `ai-service/` | `main.py` via fastapi CLI |
+| Data Service | `source venv/bin/activate && uvicorn app.main:app --reload --port 9999` | `data-service/` | `app/main.py` (NOT `main:app`) |
+
+**IMPORTANT:** The Data Service entry point is `app.main:app` (module `app/main.py`), NOT `main:app`. The AI Service uses `fastapi dev` (which reads from the project config), NOT `uvicorn main:app`.
+
+### Health Check Endpoints (EXACT — do NOT guess)
+
+| Service | URL | Expected Response |
+|---------|-----|-------------------|
+| API | `curl -sf http://localhost:9191/api/ping` | `{"ping":"pong"}` |
+| Frontend | `curl -sf http://localhost:3000` | 200 OK (HTML) |
+| AI Service | `curl -sf http://localhost:8000/health` | 200 OK |
+| Data Service | `curl -sf http://localhost:9999/health` | 200 OK (may require auth — a 401 response means the service IS running) |
 | PostgreSQL | `pg_isready -h localhost -p 5432` | exit 0 |
-| ClickHouse | http://localhost:8123/ping | "Ok." |
+| ClickHouse | `curl -sf http://localhost:8123/ping` | "Ok." |
 | Redis | `redis-cli ping` | "PONG" |
+
+**IMPORTANT:** The API does NOT have `/health`. Use `/api/ping` instead. Do NOT guess health endpoints — use the exact URLs above.
 
 ### Environment Files
 
@@ -39,17 +53,19 @@
 | AI Service | `ai-service/.env` | rifki |
 | Data Service | `data-service/.env` | kemal, iru |
 
-### Start Commands
-
-| Service | Command | Working Directory |
-|---------|---------|-------------------|
-| API | `php artisan serve --port=9191` | `api/` |
-| Frontend | `bun dev` | `web/` |
-| AI Service | `uvicorn main:app --port=8000 --reload` | `ai-service/` |
-| Data Service | `uvicorn main:app --port=9999 --reload` | `data-service/` |
-
 ### All Services
 
 Use `./run-all.sh` from the workspace root to start all services concurrently.
 Use `./run-all.sh --stop` to stop all running services.
 Use `./run-all.sh --status` to check which services are running.
+
+**Before starting services,** always check for port conflicts:
+```bash
+for port in 9191 3000 8000 9999; do
+  pid=$(lsof -ti :$port 2>/dev/null)
+  if [ -n "$pid" ]; then
+    echo "⚠ Port $port in use by PID $pid — $(ps -p $pid -o comm= 2>/dev/null)"
+  fi
+done
+```
+Kill conflicting processes before starting, or the services will fail silently.

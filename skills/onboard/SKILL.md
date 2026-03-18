@@ -289,12 +289,33 @@ Only clone services the user selected. Skip if directory already exists.
 
 ## Step 5: Install Dependencies
 
-Per selected service, install dependencies. **Always install deps even if user doesn't have .env yet** — deps are needed regardless.
+**CRITICAL: Nix shell rules for dependency installation:**
 
-- **API:** `cd api && composer install && cp .env.example .env && php artisan key:generate`
-- **Frontend:** `cd web && bun install && cp .env.example .env.local`
-- **AI Service:** `cd ai-service && pip install uv && uv venv && uv pip install -r requirements.txt && cp .env.example .env`
-- **Data Service:** `cd data-service && python3 -m venv venv && pip install -r requirements.txt && cp .env.example .env`
+1. **All commands MUST run inside `nix develop`.** If you're in a Claude Code/agent session where `nix develop` wraps your shell, all tools (php, bun, python3, composer, uv) are already available.
+2. **NEVER run multiple `nix develop` sessions in parallel.** Nix uses an eval lock — concurrent sessions will deadlock and timeout. Run ONE session, install deps SEQUENTIALLY.
+3. **The first `nix develop` may take 5-15 minutes** as Nix downloads all packages. This is normal. Use a long timeout (600s) and DO NOT panic or retry.
+4. **If `nix develop` times out**, check if it's still building: `ps aux | grep nix`. If yes, wait. If no, retry once.
+
+Install deps **sequentially in a single shell**, one service at a time:
+
+```bash
+# API (inside nix develop)
+cd api && composer install --no-interaction && cp -n .env.example .env && php artisan key:generate --no-interaction 2>/dev/null; cd ..
+
+# Frontend
+cd web && bun install && cp -n .env.example .env.local; cd ..
+
+# AI Service
+cd ai-service && uv venv && uv pip install -r requirements.txt && cp -n .env.example .env; cd ..
+
+# Data Service
+cd data-service && python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt && cp -n .env.example .env; cd ..
+```
+
+**Notes:**
+- `cp -n` = don't overwrite if .env already exists (user may have placed real creds)
+- `--no-interaction` prevents artisan from prompting
+- Run each service one at a time, wait for completion before starting the next
 
 Update `.onboard-state.json`: set `steps.install_deps` to `"completed"`.
 
@@ -438,8 +459,19 @@ Use the ask tool:
 
 ### If user says Yes:
 
-1. Run preflight: `./run-all.sh --check`
-2. If preflight passes, start services: `./run-all.sh`
+1. **Check for port conflicts first:**
+```bash
+for port in 9191 3000 8000 9999; do
+  pid=$(lsof -ti :$port 2>/dev/null)
+  if [ -n "$pid" ]; then
+    echo "⚠ Port $port in use by PID $pid — $(ps -p $pid -o comm= 2>/dev/null)"
+  fi
+done
+```
+If any ports are in use, ask user: "These ports are already in use (possibly from another workspace). Should I kill these processes?" Use the ask tool. Only kill after confirmation.
+
+2. Run preflight: `./run-all.sh --check`
+3. If preflight passes, start services: `./run-all.sh`
 3. Wait 10-15 seconds for services to boot
 4. Run health checks for EACH selected service:
 
