@@ -172,7 +172,7 @@ done
 
 ## Step 9: Configure Editor Tooling
 
-The bootstrap already installed agents and skills to `.agents/` with symlinks to `.claude/`, `.cursor/`, `.opencode/`.
+The bootstrap already installed frndOS agents and skills to `.agents/` with symlinks to `.claude/`, `.cursor/`, `.opencode/`.
 
 **Additional per-tool setup:**
 
@@ -187,16 +187,58 @@ ln -sf ../.agents/skills .cursor/skills
 
 **OpenCode:** Similar symlink check for `.opencode/`.
 
-## Step 10: Configure MCPs (if selected)
+## Step 10: Install Community Skills
 
-See [references/mcp-configs.md](references/mcp-configs.md) for per-tool MCP configuration templates.
+Skills are installed via [skills.sh](https://skills.sh/) using `npx skills add`. Install based on which services the user works on.
 
-**Lark MCP:** Configure for each selected tool.
-**Figma MCP:** Configure for each selected tool.
+**Always install (cross-service):**
+```bash
+npx skills add github/awesome-copilot/git-commit        # conventional commit messages
+npx skills add github/awesome-copilot/prd                # PRD creation
+```
 
-If neither was selected, skip.
+**If user works on Frontend (`web/`):**
+```bash
+npx skills add anthropics/skills/frontend-design         # production-grade UI
+npx skills add vercel-labs/agent-skills                   # react best practices
+npx skills add vercel-labs/next-skills                    # next.js best practices
+npx skills add busirocket/tailwindcss-v4                  # tailwind CSS v4
+npx skills add radix-ui/design-system                     # accessible components
+```
 
-## Step 11: Verify & Complete
+> Browse more skills at [skills.sh](https://skills.sh/) or use `npx skills add vercel-labs/skills/find-skills`.
+
+## Step 11: Configure MCP Servers
+
+Each tool reads MCP config from a different path:
+
+| Tool | Config File |
+|------|-------------|
+| Claude Code | `.mcp.json` (repo root) |
+| OpenCode | `opencode.json` (repo root) |
+| Cursor | `.cursor/mcp.json` |
+
+### Required MCPs (always configure)
+
+| MCP Server | Purpose | For Service |
+|-----------|---------|-------------|
+| **Context7** | Up-to-date library/framework documentation lookup | All |
+| **GitHub** | PR management, issue tracking, repository operations | All |
+| **Laravel Boost** | Laravel docs, tinker, artisan, DB queries | API only |
+
+### Optional MCPs (based on Step 1 answers)
+
+| MCP Server | Purpose |
+|-----------|---------|
+| **Lark** | Read PRDs directly from Lark doc URLs |
+| **Figma** | Design-to-code translation |
+| **Sentry** | Error tracking and monitoring |
+
+See [references/mcp-configs.md](references/mcp-configs.md) for per-tool configuration templates.
+
+Configure MCPs in the correct file for the user's selected tool(s). For service-specific MCPs (Laravel Boost), configure inside the service directory, not the workspace root.
+
+## Step 12: Verify & Complete
 
 1. Start services: `./run-all.sh --check` (preflight) then `./run-all.sh`
 2. Run health checks for each service
