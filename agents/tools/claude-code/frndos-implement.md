@@ -88,9 +88,8 @@ Service-level instructions **take precedence** over generic guidelines when they
 - Use Pydantic models for validation
 - Follow the Agno framework conventions
 
-### Data Service (FastAPI/Python/ClickHouse)
+### Data Service (FastAPI/Python)
 - Follow existing patterns
-- Use parameterized queries for ClickHouse
 - Follow pandas conventions for data processing
 
 ## ON COMPLETION

@@ -114,7 +114,7 @@ Present ALL questions in a single message:
 | 1 | API | `api/` | Laravel 13, PHP 8.5, PostgreSQL, Sanctum + JWT |
 | 2 | Frontend | `web/` | Next.js 16, React 19, TypeScript, Tailwind, Bun |
 | 3 | AI Service | `ai-service/` | FastAPI, Python, Agno, OpenAI/Anthropic/Google |
-| 4 | Data Service | `data-service/` | FastAPI, Python, ClickHouse, pandas |
+| 4 | Data Service | `data-service/` | FastAPI, Python, pandas |
 
 ### 1.2 Do you have `.env` files ready?
 
@@ -156,7 +156,7 @@ Neither is required. Workflow works without them.
 
 ## Step 2: Install Nix and Enter Dev Shell
 
-**Nix is REQUIRED. Do NOT fall back to system-installed tools.** All dependencies (PHP, Bun, Node, Python, PostgreSQL, ClickHouse, Redis, etc.) are managed through the Nix flake to ensure reproducible builds across all team members.
+**Nix is REQUIRED. Do NOT fall back to system-installed tools.** All dependencies (PHP, Bun, Node, Python, PostgreSQL, Redis, etc.) are managed through the Nix flake to ensure reproducible builds across all team members.
 
 ### 2.1 Check if Nix is installed and flakes are enabled
 
@@ -228,7 +228,7 @@ NIX_CMD=$(command -v nix 2>/dev/null || echo "/nix/var/nix/profiles/default/bin/
 $NIX_CMD develop
 ```
 
-This gives you: PHP 8.5, Composer, Bun, Node 22, Python 3.12, uv, PostgreSQL 18 (with pgvector), ClickHouse, Redis, gh, git, curl, jq.
+This gives you: PHP 8.5, Composer, Bun, Node 22, Python 3.12, uv, PostgreSQL 18 (with pgvector), Redis, gh, git, curl, jq.
 
 ### 2.4 Verify tools are available inside the shell
 

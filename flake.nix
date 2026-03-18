@@ -33,7 +33,6 @@
 
             # Databases
             (postgresql_18.withPackages (ps: [ ps.pgvector ]))
-            clickhouse
             redis
 
             # Tools
@@ -58,7 +57,7 @@
             echo "  Python:     $(python3 --version 2>/dev/null || echo 'not found')"
             echo "  uv:         $(uv --version 2>/dev/null || echo 'not found')"
             echo "  PostgreSQL: $(pg_isready --version 2>/dev/null || echo 'not found')"
-            echo "  ClickHouse: $(clickhouse --version 2>/dev/null | head -1 || echo 'not found')"
+
             echo "  Redis:      $(redis-server --version 2>/dev/null || echo 'not found')"
             echo "  gh:         $(gh --version 2>/dev/null | head -1 || echo 'not found')"
             echo "  git:        $(git --version 2>/dev/null || echo 'not found')"
@@ -70,12 +69,6 @@
               echo "  PostgreSQL:  RUNNING"
             else
               echo "  PostgreSQL:  NOT RUNNING"
-            fi
-
-            if curl -sf http://localhost:8123/ping > /dev/null 2>&1; then
-              echo "  ClickHouse:  RUNNING"
-            else
-              echo "  ClickHouse:  NOT RUNNING"
             fi
 
             if redis-cli ping > /dev/null 2>&1; then

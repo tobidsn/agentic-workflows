@@ -7,7 +7,7 @@
 | API | `api/` | alva-intelligence/frnd-api-php | Laravel 13, PHP 8.5, PostgreSQL, Sanctum + JWT | `develop` | 9191 |
 | Frontend | `web/` | alva-intelligence/frnd-web | Next.js 16, React 19, TypeScript, Tailwind CSS, Zustand, TanStack Query v5, Bun | `develop` | 3000 |
 | AI Service | `ai-service/` | alva-intelligence/frnd-ai-services | FastAPI, Python, Agno, OpenAI/Anthropic/Google, pgvector, Redis | `development` | 8000 |
-| Data Service | `data-service/` | alva-intelligence/frnd-clickhouse-api | FastAPI, Python, ClickHouse, pandas, Sentry | `development` | 9999 |
+| Data Service | `data-service/` | alva-intelligence/frnd-clickhouse-api | FastAPI, Python, pandas, Sentry | `development` | 9999 |
 
 ### Service Owners & Contacts
 
@@ -39,7 +39,7 @@
 | AI Service | `curl -sf http://localhost:8000/health` | 200 OK |
 | Data Service | `curl -sf http://localhost:9999/health` | 200 OK (may require auth — a 401 response means the service IS running) |
 | PostgreSQL | `pg_isready -h localhost -p 5432` | exit 0 |
-| ClickHouse | `curl -sf http://localhost:8123/ping` | "Ok." |
+
 | Redis | `redis-cli ping` | "PONG" |
 
 **IMPORTANT:** The API does NOT have `/health`. Use `/api/ping` instead. Do NOT guess health endpoints — use the exact URLs above.

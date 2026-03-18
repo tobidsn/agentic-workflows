@@ -63,7 +63,7 @@ Check which services the current feature touches, then verify they're running:
 | AI Service | `curl -sf http://localhost:8000/health` |
 | Data Service | `curl -sf http://localhost:9999/health` |
 | PostgreSQL | `pg_isready -h localhost -p 5432` |
-| ClickHouse | `curl -sf http://localhost:8123/ping` |
+
 | Redis | `redis-cli ping` |
 
 If any required service is DOWN:

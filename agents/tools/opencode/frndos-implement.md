@@ -93,7 +93,7 @@ After each task, update the track file at `<service>/docs/tracks/<slug>.track.md
 | API | `api/` | Laravel 13, PHP 8.5, PostgreSQL | `develop` | 9191 |
 | Frontend | `web/` | Next.js 16, React 19, TypeScript, Tailwind CSS, Bun | `develop` | 3000 |
 | AI Service | `ai-service/` | FastAPI, Python, Agno, pgvector, Redis | `development` | 8000 |
-| Data Service | `data-service/` | FastAPI, Python, ClickHouse, pandas | `development` | 9999 |
+| Data Service | `data-service/` | FastAPI, Python, pandas | `development` | 9999 |
 
 ## HEALTH CHECKS
 

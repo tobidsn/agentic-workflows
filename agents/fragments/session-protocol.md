@@ -81,7 +81,7 @@ Only check services that **actually exist** in the workspace:
 | AI Service | `ai-service/` directory | `curl -sf http://localhost:8000/health` |
 | Data Service | `data-service/` directory | `curl -sf http://localhost:9999/health` |
 | PostgreSQL | `api/` exists | `pg_isready -h localhost -p 5432` |
-| ClickHouse | `data-service/` exists | `curl -sf http://localhost:8123/ping` |
+
 | Redis | `ai-service/` exists | `redis-cli ping` |
 
 If any required service is DOWN:
