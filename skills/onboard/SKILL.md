@@ -380,14 +380,23 @@ Use the ask tool:
 1. Ask user: "Please provide the file path to the dump (e.g., `~/Downloads/frnd-dev.dump`)"
 2. **STOP AND WAIT** for user to provide the path
 3. Use the ask tool: "Is the dump file ready at the path you provided?"
-4. Only after confirmation, proceed with restore:
+4. Only after confirmation, **read the DB name from `api/.env`**:
    ```bash
-   createdb frnd 2>/dev/null || true
-   pg_restore -d frnd <path> || psql frnd < <path>
+   grep DB_DATABASE api/.env | cut -d= -f2
+   ```
+5. **Show the DB name to user and confirm before restoring.** Use the ask tool:
+   > "I'll restore the dump into database **`<db_name>`** (from api/.env). Is this correct?"
+   > - Yes, proceed
+   > - No, I want to use a different database name
+   If user says different name, ask for the correct name and use that instead.
+6. Proceed with restore:
+   ```bash
+   createdb <db_name> 2>/dev/null || true
+   pg_restore -d <db_name> <path> || psql <db_name> < <path>
    cd api && php artisan migrate --no-interaction; cd ..
    ```
-5. Verify: `psql -h localhost -p 5432 -d frnd -c "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public'"` — should return > 0
-6. Mark `steps.db_setup` as `"completed"`
+7. Verify: `psql -h localhost -p 5432 -d <db_name> -c "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public'"` — should return > 0
+8. Mark `steps.db_setup` as `"completed"`
 
 **If "No, but I can get it now":**
 
