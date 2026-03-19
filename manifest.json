@@ -1,5 +1,5 @@
 {
-  "version": "2.0.6",
+  "version": "2.0.7",
   "updated": "2026-03-19",
   "files": {
     "agents/fragments/session-protocol.md": {
@@ -33,7 +33,7 @@
       "type": "fragment"
     },
     "agents/fragments/service-registry.md": {
-      "sha256": "86a5a8b906ef5c2968ad8637e138752b5b989cc0505d506b1c4388f4f64b67f2",
+      "sha256": "0db0c17701df21d95a74aeeedd00437f435952653071c93d97d6b7d5ec010c38",
       "install_to": ".agentic-workflows/fragments/service-registry.md",
       "type": "fragment"
     },
@@ -83,12 +83,12 @@
       "type": "template"
     },
     "skills/onboard/SKILL.md": {
-      "sha256": "b6470c073d36fcca8444fae16d67ceb5acd062b6fb60b001654a7c0ccecd02ea",
+      "sha256": "d6579522b9709448ebd4a26279cdb5b6d7606e5f0acad42c6d83598492345dd1",
       "install_to": ".agents/skills/onboard/SKILL.md",
       "type": "skill"
     },
     "skills/onboard/references/run-all-template.sh": {
-      "sha256": "9d57c81d6cb88fe68f11ae749a0afee767ad3ae868cdbdc0ea5476264000f633",
+      "sha256": "ca63274f8b86c42052a2187465354e687d9fe1fb9d43a3cfa7828007d84d7c87",
       "install_to": ".agents/skills/onboard/references/run-all-template.sh",
       "type": "reference"
     },
