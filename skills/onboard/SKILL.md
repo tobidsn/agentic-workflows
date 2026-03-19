@@ -323,20 +323,42 @@ Update `.onboard-state.json`: set `steps.install_deps` to `"completed"`.
 
 The `.env.example` files were copied in Step 5, but they contain placeholder values. **Each service needs real credentials to run.**
 
-For EACH selected service, ask the user:
+**Process EACH selected service ONE AT A TIME.** Use the ask tool for each:
 
-> "Do you have the real `.env` file for **[service]**? You need it from **[contact]**."
+> "Do you have the real `.env` credentials for **[service]**?"
+> - Yes, I have them ready
+> - No, I'll get them later from [contact]
 
-| Service | Env File | What User Must Do | Contact |
-|---------|---------|-------------------|---------|
-| API | `api/.env` | Replace `api/.env` with real credentials | arhen |
-| Frontend | `web/.env.local` | Replace `web/.env.local` with real credentials | fahrizky, daffa |
-| AI Service | `ai-service/.env` | Replace `ai-service/.env` with real credentials | rifki |
-| Data Service | `data-service/.env` | Replace `data-service/.env` with real credentials | kemal, iru |
+| Service | Env File | Contact |
+|---------|---------|---------|
+| API | `api/.env` | arhen |
+| Frontend | `web/.env.local` | fahrizky, daffa |
+| AI Service | `ai-service/.env` | rifki |
+| Data Service | `data-service/.env` | kemal, iru |
 
-**For each service, one of:**
-- **"I have it"** → Ask user to drop/paste the file, or confirm it's already in place. Verify the file exists and is NOT the example: check it doesn't contain `your-secret-here` or `CHANGE_ME` placeholder patterns. Mark `env_status.<service>` as `"completed"`.
-- **"I don't have it yet"** → Mark `env_status.<service>` as `"pending"`. Tell user who to contact. **Continue onboarding** — don't block here, but record it.
+**If user says "Yes, I have them":**
+
+1. Tell user: "Please replace the `.env` file now. You can either:
+   - Drop/paste the file content into the chat
+   - Or place the file manually at `<service>/<env-file>` and tell me when done"
+2. **STOP AND WAIT.** Do NOT continue until user confirms they've provided the file.
+3. Use the ask tool to confirm:
+   > "Have you placed the real `.env` file for **[service]**?"
+   > - Yes, it's in place
+   > - I need more time
+4. Only after confirmation, verify the file is NOT a placeholder:
+   ```bash
+   # Check for common placeholder patterns
+   grep -qE 'your-secret-here|CHANGE_ME|your_.*_key|example\.com|placeholder' <service>/<env-file> && echo "⚠ Still has placeholders" || echo "✓ Looks real"
+   ```
+5. Mark `env_status.<service>` as `"completed"`
+
+**If user says "No, I'll get them later":**
+- Mark `env_status.<service>` as `"pending"`
+- Tell user who to contact
+- Move to the next service
+
+**IMPORTANT: Do NOT batch all services into one question.** Ask one at a time, wait for the answer, process it, then ask the next. This ensures the user has time to provide each file.
 
 After checking all services:
 - If ALL selected services have real .env files → set `steps.env_files` to `"completed"`
