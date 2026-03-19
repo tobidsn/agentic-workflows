@@ -380,23 +380,31 @@ Use the ask tool:
 1. Ask user: "Please provide the file path to the dump (e.g., `~/Downloads/frnd-dev.dump`)"
 2. **STOP AND WAIT** for user to provide the path
 3. Use the ask tool: "Is the dump file ready at the path you provided?"
-4. Only after confirmation, **read the DB name from `api/.env`**:
+4. Use the ask tool to ask the database name:
+   > "What database name do you want to use for the restore? (e.g., `frnd`, `frndos`, etc.)"
+5. **STOP AND WAIT** for user to provide the name.
+6. Check if the database exists:
    ```bash
-   grep DB_DATABASE api/.env | cut -d= -f2
+   psql -h localhost -p 5432 -lqt | cut -d\| -f1 | grep -qw <db_name>
    ```
-5. **Show the DB name to user and confirm before restoring.** Use the ask tool:
-   > "I'll restore the dump into database **`<db_name>`** (from api/.env). Is this correct?"
-   > - Yes, proceed
-   > - No, I want to use a different database name
-   If user says different name, ask for the correct name and use that instead.
-6. Proceed with restore:
+   - **If it does NOT exist** → create it: `createdb <db_name>`
+   - **If it DOES exist** → use the ask tool:
+     > "Database `<db_name>` already exists. Should I drop and recreate it? All existing data will be lost."
+     > - Yes, clean and recreate
+     > - No, cancel
+     If yes: `dropdb <db_name> && createdb <db_name>`
+7. Restore the dump:
    ```bash
-   createdb <db_name> 2>/dev/null || true
-   pg_restore -d <db_name> <path> || psql <db_name> < <path>
+   pg_restore -d <db_name> <path> 2>/dev/null || psql <db_name> < <path>
+   ```
+8. Run migrations:
+   ```bash
    cd api && php artisan migrate --no-interaction; cd ..
    ```
-7. Verify: `psql -h localhost -p 5432 -d <db_name> -c "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public'"` — should return > 0
-8. Mark `steps.db_setup` as `"completed"`
+9. Verify: `psql -h localhost -p 5432 -d <db_name> -c "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public'"` — should return > 0
+10. **Remind user to update api/.env:**
+    > "Database restored to `<db_name>`. **Make sure `DB_DATABASE=<db_name>` in your `api/.env` before we verify services.**"
+11. Mark `steps.db_setup` as `"completed"`
 
 **If "No, but I can get it now":**
 
