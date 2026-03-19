@@ -1,0 +1,241 @@
+{
+  "version": "2.0.0",
+  "updated": "2026-03-18",
+  "files": {
+    "agents/fragments/session-protocol.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/fragments/session-protocol.md",
+      "type": "fragment"
+    },
+    "agents/fragments/workflow-rules.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/fragments/workflow-rules.md",
+      "type": "fragment"
+    },
+    "agents/fragments/prd-conventions.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/fragments/prd-conventions.md",
+      "type": "fragment"
+    },
+    "agents/fragments/track-conventions.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/fragments/track-conventions.md",
+      "type": "fragment"
+    },
+    "agents/fragments/wireframe-conventions.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/fragments/wireframe-conventions.md",
+      "type": "fragment"
+    },
+    "agents/fragments/git-conventions.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/fragments/git-conventions.md",
+      "type": "fragment"
+    },
+    "agents/fragments/service-registry.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/fragments/service-registry.md",
+      "type": "fragment"
+    },
+    "agents/AGENTS.md.template": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/AGENTS.md.template",
+      "type": "template"
+    },
+    "scripts/update-check.sh": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/scripts/update-check.sh",
+      "type": "script"
+    },
+    "scripts/generate-agents.sh": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/scripts/generate-agents.sh",
+      "type": "script"
+    },
+    "workflow/phases.json": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/workflow/phases.json",
+      "type": "workflow"
+    },
+    "workflow/gates.json": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/workflow/gates.json",
+      "type": "workflow"
+    },
+    "workflow/state-schema.json": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/workflow/state-schema.json",
+      "type": "workflow"
+    },
+    "templates/prd/main-prd.template.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/templates/prd/main-prd.template.md",
+      "type": "template"
+    },
+    "templates/prd/service-prd.template.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/templates/prd/service-prd.template.md",
+      "type": "template"
+    },
+    "templates/tracks/feature.track.template.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/templates/tracks/feature.track.template.md",
+      "type": "template"
+    },
+    "skills/onboard/SKILL.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agents/skills/onboard/SKILL.md",
+      "type": "skill"
+    },
+    "skills/onboard/references/run-all-template.sh": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agents/skills/onboard/references/run-all-template.sh",
+      "type": "reference"
+    },
+    "skills/onboard/references/mcp-configs.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agents/skills/onboard/references/mcp-configs.md",
+      "type": "reference"
+    },
+    "skills/workflow/SKILL.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agents/skills/workflow/SKILL.md",
+      "type": "skill"
+    },
+    "skills/prd/SKILL.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agents/skills/prd/SKILL.md",
+      "type": "skill"
+    },
+    "skills/prd-split/SKILL.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agents/skills/prd-split/SKILL.md",
+      "type": "skill"
+    },
+    "skills/wireframe/SKILL.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agents/skills/wireframe/SKILL.md",
+      "type": "skill"
+    },
+    "agents/tools/claude-code/frndos-orchestra.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agents/agents/frndos-orchestra.md",
+      "type": "agent"
+    },
+    "agents/tools/claude-code/frndos-prd.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agents/agents/frndos-prd.md",
+      "type": "agent"
+    },
+    "agents/tools/claude-code/frndos-wireframe.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agents/agents/frndos-wireframe.md",
+      "type": "agent"
+    },
+    "agents/tools/claude-code/frndos-splitter.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agents/agents/frndos-splitter.md",
+      "type": "agent"
+    },
+    "agents/tools/claude-code/frndos-implement.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agents/agents/frndos-implement.md",
+      "type": "agent"
+    },
+    "agents/tools/claude-code/frndos-pr.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agents/agents/frndos-pr.md",
+      "type": "agent"
+    },
+    "agents/tools/claude-code/frndos-track.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agents/agents/frndos-track.md",
+      "type": "agent"
+    },
+    "agents/tools/cursor/frndos-orchestra.mdc": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/agents/cursor/frndos-orchestra.mdc",
+      "type": "agent"
+    },
+    "agents/tools/cursor/frndos-prd.mdc": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/agents/cursor/frndos-prd.mdc",
+      "type": "agent"
+    },
+    "agents/tools/cursor/frndos-wireframe.mdc": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/agents/cursor/frndos-wireframe.mdc",
+      "type": "agent"
+    },
+    "agents/tools/cursor/frndos-splitter.mdc": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/agents/cursor/frndos-splitter.mdc",
+      "type": "agent"
+    },
+    "agents/tools/cursor/frndos-implement.mdc": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/agents/cursor/frndos-implement.mdc",
+      "type": "agent"
+    },
+    "agents/tools/cursor/frndos-pr.mdc": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/agents/cursor/frndos-pr.mdc",
+      "type": "agent"
+    },
+    "agents/tools/cursor/frndos-track.mdc": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/agents/cursor/frndos-track.mdc",
+      "type": "agent"
+    },
+    "agents/tools/opencode/frndos-orchestra.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/agents/opencode/frndos-orchestra.md",
+      "type": "agent"
+    },
+    "agents/tools/opencode/frndos-prd.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/agents/opencode/frndos-prd.md",
+      "type": "agent"
+    },
+    "agents/tools/opencode/frndos-wireframe.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/agents/opencode/frndos-wireframe.md",
+      "type": "agent"
+    },
+    "agents/tools/opencode/frndos-splitter.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/agents/opencode/frndos-splitter.md",
+      "type": "agent"
+    },
+    "agents/tools/opencode/frndos-implement.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/agents/opencode/frndos-implement.md",
+      "type": "agent"
+    },
+    "agents/tools/opencode/frndos-pr.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/agents/opencode/frndos-pr.md",
+      "type": "agent"
+    },
+    "agents/tools/opencode/frndos-track.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/agents/opencode/frndos-track.md",
+      "type": "agent"
+    },
+    "wireframe-scaffold/layout.tsx": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/wireframe-scaffold/layout.tsx",
+      "type": "scaffold"
+    },
+    "wireframe-scaffold/page.tsx": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/wireframe-scaffold/page.tsx",
+      "type": "scaffold"
+    },
+    "flake.nix": {
+      "sha256": "PLACEHOLDER",
+      "install_to": "flake.nix",
+      "type": "config"
+    }
+  }
+}
