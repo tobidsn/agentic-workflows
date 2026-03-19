@@ -8,11 +8,13 @@ All MCP configs follow tool-specific formats. Merge these into the appropriate c
 |------|-------------|-------------|----------------|---------|
 | Claude Code | `.mcp.json` | `mcpServers` | `"command": "npx", "args": [...]` | `env` |
 | Cursor | `.cursor/mcp.json` | `mcpServers` | `"command": "npx", "args": [...]` | `env` |
-| OpenCode | `opencode.json` | `mcp` | `"type": "local", "command": ["npx", ...]` | `environment` |
+| OpenCode | `opencode.json` | `mcp` | `"type": "local", "command": ["npx", ...], "enabled": true` | `environment` |
 
 ---
 
 ## Context7 (Required — all services)
+
+Package: `@upstash/context7-mcp`
 
 ### Claude Code (`.mcp.json`)
 
@@ -21,7 +23,7 @@ All MCP configs follow tool-specific formats. Merge these into the appropriate c
   "mcpServers": {
     "context7": {
       "command": "npx",
-      "args": ["-y", "@context7/mcp"]
+      "args": ["-y", "@upstash/context7-mcp"]
     }
   }
 }
@@ -34,7 +36,7 @@ All MCP configs follow tool-specific formats. Merge these into the appropriate c
   "mcpServers": {
     "context7": {
       "command": "npx",
-      "args": ["-y", "@context7/mcp"]
+      "args": ["-y", "@upstash/context7-mcp"]
     }
   }
 }
@@ -47,7 +49,7 @@ All MCP configs follow tool-specific formats. Merge these into the appropriate c
   "mcp": {
     "context7": {
       "type": "local",
-      "command": ["npx", "-y", "@context7/mcp"],
+      "command": ["npx", "-y", "@upstash/context7-mcp"],
       "enabled": true
     }
   }
@@ -57,6 +59,8 @@ All MCP configs follow tool-specific formats. Merge these into the appropriate c
 ---
 
 ## GitHub MCP (Required — all services)
+
+Package: `@modelcontextprotocol/server-github`
 
 ### Claude Code (`.mcp.json`)
 
@@ -113,6 +117,8 @@ All MCP configs follow tool-specific formats. Merge these into the appropriate c
 
 ## Laravel Boost MCP (Required — API service only)
 
+Package: `@nicholasgriffintn/laravel-boost-mcp`
+
 Configure inside `api/` directory only.
 
 ### Claude Code (`api/.mcp.json`)
@@ -158,6 +164,8 @@ Configure inside `api/` directory only.
 ---
 
 ## Sentry MCP (Optional — production debugging)
+
+Package: `@sentry/mcp-server`
 
 ### Claude Code (`.mcp.json`)
 
@@ -214,18 +222,18 @@ Configure inside `api/` directory only.
 
 ## Lark MCP (Optional — PRD from Lark docs)
 
-### Claude Code (`.claude/settings.local.json`)
+Package: `@larksuiteoapi/lark-mcp`
+
+**Note:** Lark MCP uses command-line args for credentials, not env vars.
+
+### Claude Code (`.mcp.json`)
 
 ```json
 {
   "mcpServers": {
     "lark": {
       "command": "npx",
-      "args": ["-y", "@anthropic/lark-mcp"],
-      "env": {
-        "LARK_APP_ID": "<from-team-lead>",
-        "LARK_APP_SECRET": "<from-team-lead>"
-      }
+      "args": ["-y", "@larksuiteoapi/lark-mcp", "mcp", "-a", "<LARK_APP_ID>", "-s", "<LARK_APP_SECRET>"]
     }
   }
 }
@@ -238,11 +246,7 @@ Configure inside `api/` directory only.
   "mcpServers": {
     "lark": {
       "command": "npx",
-      "args": ["-y", "@anthropic/lark-mcp"],
-      "env": {
-        "LARK_APP_ID": "<from-team-lead>",
-        "LARK_APP_SECRET": "<from-team-lead>"
-      }
+      "args": ["-y", "@larksuiteoapi/lark-mcp", "mcp", "-a", "<LARK_APP_ID>", "-s", "<LARK_APP_SECRET>"]
     }
   }
 }
@@ -255,12 +259,8 @@ Configure inside `api/` directory only.
   "mcp": {
     "lark": {
       "type": "local",
-      "command": ["npx", "-y", "@anthropic/lark-mcp"],
-      "enabled": true,
-      "environment": {
-        "LARK_APP_ID": "<from-team-lead>",
-        "LARK_APP_SECRET": "<from-team-lead>"
-      }
+      "command": ["npx", "-y", "@larksuiteoapi/lark-mcp", "mcp", "-a", "<LARK_APP_ID>", "-s", "<LARK_APP_SECRET>"],
+      "enabled": true
     }
   }
 }
@@ -272,33 +272,41 @@ Configure inside `api/` directory only.
 
 ## Figma MCP (Optional — design-to-code)
 
-### Claude Code (`.claude/settings.local.json`)
+**Remote server** — no npm package needed. Connects to `https://mcp.figma.com/mcp`.
 
+### Claude Code
+
+Run this command (or add manually to `.mcp.json`):
+```bash
+claude mcp add --transport http figma https://mcp.figma.com/mcp
+```
+
+Or manually in `.mcp.json`:
 ```json
 {
   "mcpServers": {
     "figma": {
-      "command": "npx",
-      "args": ["-y", "@anthropic/figma-mcp"],
-      "env": {
-        "FIGMA_ACCESS_TOKEN": "<your-personal-access-token>"
-      }
+      "url": "https://mcp.figma.com/mcp",
+      "type": "http"
     }
   }
 }
 ```
 
-### Cursor (`.cursor/mcp.json`)
+### Cursor
 
+Use the Cursor plugin system:
+```
+/add-plugin figma
+```
+
+Or manually in `.cursor/mcp.json`:
 ```json
 {
   "mcpServers": {
     "figma": {
-      "command": "npx",
-      "args": ["-y", "@anthropic/figma-mcp"],
-      "env": {
-        "FIGMA_ACCESS_TOKEN": "<your-personal-access-token>"
-      }
+      "url": "https://mcp.figma.com/mcp",
+      "type": "http"
     }
   }
 }
@@ -310,15 +318,13 @@ Configure inside `api/` directory only.
 {
   "mcp": {
     "figma": {
-      "type": "local",
-      "command": ["npx", "-y", "@anthropic/figma-mcp"],
-      "enabled": true,
-      "environment": {
-        "FIGMA_ACCESS_TOKEN": "<your-personal-access-token>"
-      }
+      "type": "remote",
+      "url": "https://mcp.figma.com/mcp",
+      "enabled": true
     }
   }
 }
 ```
 
-**Credentials:** Generate a personal access token at https://www.figma.com/developers/api#access-tokens
+**No API token needed** — authenticates via browser OAuth when first used.
+See: https://help.figma.com/hc/en-us/articles/32132100833559
