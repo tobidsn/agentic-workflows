@@ -42,7 +42,7 @@ Ask the user:
 Execute the bootstrap script to install all workflow files into the current workspace:
 
 ```bash
-curl -sL "https://raw.githubusercontent.com/alva-intelligence/agentic-workflows/agentic/scripts/update-check.sh" \
+curl -sL "https://raw.githubusercontent.com/alva-intelligence/agentic-workflows/main/scripts/update-check.sh" \
   -o /tmp/aw-update-check.sh && bash /tmp/aw-update-check.sh --bootstrap
 ```
 
