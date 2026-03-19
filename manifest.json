@@ -1,5 +1,5 @@
 {
-  "version": "2.0.2",
+  "version": "2.0.3",
   "updated": "2026-03-19",
   "files": {
     "agents/fragments/session-protocol.md": {
@@ -83,7 +83,7 @@
       "type": "template"
     },
     "skills/onboard/SKILL.md": {
-      "sha256": "b36657f7c83f91c6306e6bff6658eaa042dfa734da676c789b85696f3d0a6fde",
+      "sha256": "3f2ff1c9ab6271263141fdb66d33e919cbbaa2a3229b739f2b4fd77cbaa727ec",
       "install_to": ".agents/skills/onboard/SKILL.md",
       "type": "skill"
     },
