@@ -131,9 +131,18 @@ Present ALL questions in a single message:
 
 ### 1.3 Which editor/CLI do you use?
 
-Editors: Cursor, Zed, Antigravity
-CLI Agents: Claude Code, OpenCode, Codex
-(Can select multiple — this determines agent and MCP configuration)
+Use the ask tool with these EXACT options (multi-select):
+
+| # | Tool | Type | Description |
+|---|------|------|-------------|
+| 1 | Claude Code | CLI Agent | Best for complex multi-service tasks, strong tool use |
+| 2 | OpenCode | CLI Agent | Lightweight, fast, configurable |
+| 3 | Cursor | Editor | Deep AI integration, multi-file editing, agent mode |
+| 4 | Codex | CLI Agent | OpenAI-native code generation |
+| 5 | Zed | Editor | Fast, lightweight, multiplayer |
+| 6 | Other | — | Type your own |
+
+(Can select multiple — this determines agent, skill, and MCP configuration)
 
 ### 1.4 Which AI provider subscriptions?
 
