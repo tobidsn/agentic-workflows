@@ -319,74 +319,83 @@ cd data-service && python3 -m venv .venv && cd ..
 
 ### 5.2 Install deps per service
 
-```bash
-# API
-cd api && composer install --no-interaction && cp -n .env.example .env && php artisan key:generate --no-interaction 2>/dev/null; cd ..
+**Do NOT create .env files from .env.example.** The user will provide real .env files in Step 6.
 
-# Frontend
-cd web && bun install && cp -n .env.example .env.local; cd ..
+```bash
+# API (no .env copy — user provides real one later)
+cd api && composer install --no-interaction; cd ..
+
+# Frontend (no .env copy — user provides real one later)
+cd web && bun install; cd ..
 
 # AI Service (venv already created in 5.1)
-cd ai-service && source .venv/bin/activate && uv pip install -r requirements.txt && cp -n .env.example .env && deactivate; cd ..
+cd ai-service && source .venv/bin/activate && uv pip install -r requirements.txt && deactivate; cd ..
 
 # Data Service (venv already created in 5.1)
-cd data-service && source .venv/bin/activate && pip install -r requirements.txt && cp -n .env.example .env && deactivate; cd ..
+cd data-service && source .venv/bin/activate && pip install -r requirements.txt && deactivate; cd ..
 ```
 
 **IMPORTANT:**
+- **Do NOT run `cp .env.example .env`** — the user will drop real .env files in Step 6.
+- **Do NOT run `php artisan key:generate`** yet — needs real .env first.
 - Run each service one at a time. Wait for completion before starting the next.
-- `cp -n` = don't overwrite if .env already exists (user may have placed real creds).
 - If a command fails, show the error and ask user if they want to retry or skip.
 - The agent runs these directly. Never show commands and ask user to run them.
 
 Update `.onboard-state.json`: set `steps.install_deps` to `"completed"`.
 
-## Step 6: Set Up Environment Files — **STOP, ask for EACH service**
+## Step 6: Set Up Environment Files — **STOP**
 
-The `.env.example` files were copied in Step 5, but they contain placeholder values. **Each service needs real credentials to run.**
+**Each service needs real credentials. The user must provide .env files before the project can run.**
 
-**Process EACH selected service ONE AT A TIME.** Use the ask tool for each:
+Use the ask tool:
 
-> "Do you have the real `.env` credentials for **[service]**?"
-> - Yes, I have them ready
-> - No, I'll get them later from [contact]
+> "Do you have the `.env` files for your services? Each service needs real credentials from the service owner."
+>
+> | Service | Env File | Contact |
+> |---------|---------|---------|
+> | API | `api/.env` | arhen |
+> | Frontend | `web/.env.local` | fahrizky, daffa |
+> | AI Service | `ai-service/.env` | rifki |
+> | Data Service | `data-service/.env` | kemal, iru |
+>
+> - Yes, I have all the .env files ready
+> - I have some but not all
+> - No, I'll get them later
 
-| Service | Env File | Contact |
-|---------|---------|---------|
-| API | `api/.env` | arhen |
-| Frontend | `web/.env.local` | fahrizky, daffa |
-| AI Service | `ai-service/.env` | rifki |
-| Data Service | `data-service/.env` | kemal, iru |
+**If "Yes, I have all" or "I have some":**
 
-**If user says "Yes, I have them":**
-
-1. Tell user: "Please replace the `.env` file now. You can either:
-   - Drop/paste the file content into the chat
-   - Or place the file manually at `<service>/<env-file>` and tell me when done"
-2. **STOP AND WAIT.** Do NOT continue until user confirms they've provided the file.
-3. Use the ask tool to confirm:
-   > "Have you placed the real `.env` file for **[service]**?"
-   > - Yes, it's in place
-   > - I need more time
-4. Only after confirmation, verify the file is NOT a placeholder:
+1. Tell user: "Please paste or upload each .env file content here. I'll write them to the correct locations."
+2. **STOP AND WAIT** for user to paste/upload. The user may send one file at a time or all at once.
+3. For each .env content the user provides:
+   - Identify which service it belongs to (look for service-specific keys like `DB_DATABASE` for API, `NEXT_PUBLIC_` for Frontend, etc.)
+   - Write the content to the correct path:
+     - API → `api/.env`
+     - Frontend → `web/.env.local`
+     - AI Service → `ai-service/.env`
+     - Data Service → `data-service/.env`
+   - If you can't identify the service, ask the user which service it's for
+4. After writing each file, confirm: "✓ Written to `<path>`"
+5. After all files are written, verify:
    ```bash
-   # Check for common placeholder patterns
-   grep -qE 'your-secret-here|CHANGE_ME|your_.*_key|example\.com|placeholder' <service>/<env-file> && echo "⚠ Still has placeholders" || echo "✓ Looks real"
+   [ -f api/.env ] && echo "✓ api/.env" || echo "✗ api/.env missing"
+   [ -f web/.env.local ] && echo "✓ web/.env.local" || echo "✗ web/.env.local missing"
+   [ -f ai-service/.env ] && echo "✓ ai-service/.env" || echo "✗ ai-service/.env missing"
+   [ -f data-service/.env ] && echo "✓ data-service/.env" || echo "✗ data-service/.env missing"
    ```
-5. Mark `env_status.<service>` as `"completed"`
+6. If any selected services are still missing .env, ask user to provide them before continuing.
+7. Once all .env files are in place, **run post-env setup for API:**
+   ```bash
+   cd api && php artisan key:generate --no-interaction && cd ..
+   ```
+8. Mark `env_status` per service and set `steps.env_files` accordingly.
 
-**If user says "No, I'll get them later":**
-- Mark `env_status.<service>` as `"pending"`
-- Tell user who to contact
-- Move to the next service
+**If "No, I'll get them later":**
+- Mark all `env_status.<service>` as `"pending"`
+- Tell user: "Contact the service owners listed above. `/workflow start` will block until all .env files are provided."
+- Continue onboarding with remaining steps
 
-**IMPORTANT: Do NOT batch all services into one question.** Ask one at a time, wait for the answer, process it, then ask the next. This ensures the user has time to provide each file.
-
-After checking all services:
-- If ALL selected services have real .env files → set `steps.env_files` to `"completed"`
-- If ANY are pending → set `steps.env_files` to `"partial"` and list what's missing
-
-**The user can continue onboarding with partial .env setup, but `/workflow start` will block until ALL are completed.**
+**The user can continue onboarding with missing .env files, but `/workflow start` will block until ALL are provided.**
 
 ## Step 7: Database Setup — **STOP, ask user**
 
