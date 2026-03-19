@@ -109,12 +109,16 @@ Present ALL questions in a single message:
 
 ### 1.1 Which services will you work on?
 
-| # | Service | Directory | Stack |
-|---|---------|-----------|-------|
-| 1 | API | `api/` | Laravel 13, PHP 8.5, PostgreSQL, Sanctum + JWT |
-| 2 | Frontend | `web/` | Next.js 16, React 19, TypeScript, Tailwind, Bun |
-| 3 | AI Service | `ai-service/` | FastAPI, Python, Agno, OpenAI/Anthropic/Google |
-| 4 | Data Service | `data-service/` | FastAPI, Python, pandas |
+| # | Service | Directory | Stack | Port(s) |
+|---|---------|-----------|-------|---------|
+| 1 | API | `api/` | Laravel 13, PHP 8.5, PostgreSQL, Sanctum + JWT | :9191 (server) + queue worker |
+| 2 | Frontend | `web/` | Next.js 16, React 19, TypeScript, Tailwind, Bun | :3000 |
+| 3 | AI Service | `ai-service/` | FastAPI, Python, Agno, OpenAI/Anthropic/Google | :8000 |
+| 4 | Data Service | `data-service/` | FastAPI, Python, pandas | :9999 |
+
+**Also started automatically by `run-all.sh`:**
+- **API Queue Worker** — processes background jobs (always runs with API)
+- **Mailhog** — captures emails sent by the API for local testing (:1025 SMTP, :8025 UI)
 
 ### 1.2 Do you have `.env` files ready?
 
@@ -570,9 +574,9 @@ Use the ask tool:
 
 ### If user says Yes:
 
-1. **Check for port conflicts first:**
+1. **Check for port conflicts first** (same ports as run-all.sh):
 ```bash
-for port in 9191 3000 8000 9999; do
+for port in 9191 3000 8000 9999 1025 8025; do
   pid=$(lsof -ti :$port 2>/dev/null)
   if [ -n "$pid" ]; then
     echo "⚠ Port $port in use by PID $pid — $(ps -p $pid -o comm= 2>/dev/null)"
@@ -583,17 +587,30 @@ If any ports are in use, ask user: "These ports are already in use (possibly fro
 
 2. Run preflight: `./run-all.sh --check`
 3. If preflight passes, start services: `./run-all.sh`
-3. Wait 10-15 seconds for services to boot
-4. Run health checks for EACH selected service:
+4. Wait 10-15 seconds for services to boot
+5. Run health checks — **use the EXACT same checks as `./run-all.sh --status`:**
 
 ```bash
-# Check each service that was set up
-curl -sf http://localhost:9191/health && echo "✓ API" || echo "✗ API"
-curl -sf http://localhost:3000 && echo "✓ Frontend" || echo "✗ Frontend"
-curl -sf http://localhost:8000/health && echo "✓ AI Service" || echo "✗ AI Service"
-curl -sf http://localhost:9999/health && echo "✓ Data Service" || echo "✗ Data Service"
-pg_isready -h localhost -p 5432 && echo "✓ PostgreSQL" || echo "✗ PostgreSQL"
-redis-cli ping && echo "✓ Redis" || echo "✗ Redis"
+# API: any HTTP response = running (try /api/ping, fall back to /)
+api_code=$(curl -so /dev/null -w "%{http_code}" http://localhost:9191/api/ping 2>/dev/null || echo "000")
+[[ "$api_code" != "000" ]] && echo "✓ API (HTTP $api_code)" || echo "✗ API — down"
+
+# Frontend
+curl -sf http://localhost:3000 &>/dev/null && echo "✓ Frontend" || echo "✗ Frontend — down"
+
+# AI Service
+curl -sf http://localhost:8000/health &>/dev/null && echo "✓ AI Service" || echo "✗ AI Service — down"
+
+# Data Service: 401 = auth-protected but running
+data_code=$(curl -so /dev/null -w "%{http_code}" http://localhost:9999/api/v1/health/ 2>/dev/null || echo "000")
+[[ "$data_code" == "200" || "$data_code" == "401" ]] && echo "✓ Data Service (HTTP $data_code)" || echo "✗ Data Service — down"
+
+# Infrastructure
+pg_isready -h localhost -p 5432 && echo "✓ PostgreSQL" || echo "✗ PostgreSQL — down"
+redis-cli ping &>/dev/null && echo "✓ Redis" || echo "✗ Redis — down"
+
+# Mailhog (optional)
+curl -sf http://localhost:8025 &>/dev/null && echo "✓ Mailhog" || echo "○ Mailhog — not running (optional)"
 ```
 
 5. **If ALL health checks pass:**
