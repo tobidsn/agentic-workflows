@@ -116,9 +116,9 @@ show_status() {
   echo ""
 
   echo -e "${BOLD}Health Checks${NC}\n"
-  # API: try /api/ping first, fall back to / (any response = running)
+  # API: check /api endpoint
   local api_code
-  api_code=$(curl -so /dev/null -w "%{http_code}" http://localhost:9191/api/ping 2>/dev/null || echo "000")
+  api_code=$(curl -so /dev/null -w "%{http_code}" http://localhost:9191/api 2>/dev/null || echo "000")
   [[ "$api_code" != "000" ]] && log_ok "API (9191) — HTTP $api_code" || log_warn "API (9191) — down"
 
   curl -sf http://localhost:3000 &>/dev/null && log_ok "Frontend (3000)" || log_warn "Frontend (3000) — down"

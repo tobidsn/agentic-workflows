@@ -34,7 +34,7 @@
 
 | Service | Check Command | Healthy If |
 |---------|--------------|-----------|
-| API | `curl -so /dev/null -w "%{http_code}" http://localhost:9191/` | Any 2xx or 3xx (try `/api/ping` first, fall back to `/`) |
+| API | `curl -so /dev/null -w "%{http_code}" http://localhost:9191/api` | Any HTTP response = running |
 | Frontend | `curl -sf http://localhost:3000` | 200 OK |
 | AI Service | `curl -sf http://localhost:8000/health` | 200 OK |
 | Data Service | `curl -so /dev/null -w "%{http_code}" http://localhost:9999/api/v1/health/` | 200 OR 401 (401 = running but auth-protected) |
@@ -42,7 +42,7 @@
 | Redis | `redis-cli ping` | "PONG" |
 
 **IMPORTANT:**
-- The API may not have `/api/ping` on all branches. Try it first, fall back to `/` (root). Any HTTP response = running.
+- The API health check is at `/api`. Any HTTP response = running.
 - The Data Service health endpoint is auth-protected. A **401 response means the service IS running** — treat it as healthy.
 - Do NOT guess health endpoints — use the URLs above.
 

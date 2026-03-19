@@ -591,8 +591,8 @@ If any ports are in use, ask user: "These ports are already in use (possibly fro
 5. Run health checks — **use the EXACT same checks as `./run-all.sh --status`:**
 
 ```bash
-# API: any HTTP response = running (try /api/ping, fall back to /)
-api_code=$(curl -so /dev/null -w "%{http_code}" http://localhost:9191/api/ping 2>/dev/null || echo "000")
+# API: check /api endpoint
+api_code=$(curl -so /dev/null -w "%{http_code}" http://localhost:9191/api 2>/dev/null || echo "000")
 [[ "$api_code" != "000" ]] && echo "✓ API (HTTP $api_code)" || echo "✗ API — down"
 
 # Frontend
