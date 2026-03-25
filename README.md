@@ -7,6 +7,8 @@
 ## For LLM Agents — Read This First
 
 > **If you are an LLM agent and a user has pointed you at this repository, follow the instructions below.**
+>
+> **CRITICAL: Do NOT clone this repository.** This repo is an instruction set, not a project to clone. The workspace directory should remain a plain folder (NOT a git repo). You install files by running the bootstrap script below, which downloads only the needed files. NEVER run `git clone` with this repo URL into the user's workspace.
 
 ### Step 1: Welcome the user
 
@@ -37,16 +39,16 @@ Ask the user:
 
 **Wait for the user's response.** Do NOT proceed without explicit confirmation.
 
-### Step 3: If yes — run the bootstrap
+### Step 3: If yes — run the bootstrap (DO NOT CLONE)
 
-Execute the bootstrap script to install all workflow files into the current workspace:
+**Do NOT run `git clone`.** Instead, run the bootstrap script which downloads individual files into the current directory:
 
 ```bash
 curl -sL "https://raw.githubusercontent.com/alva-intelligence/agentic-workflows/main/scripts/update-check.sh" \
   -o /tmp/aw-update-check.sh && bash /tmp/aw-update-check.sh --bootstrap
 ```
 
-This downloads all agents, skills, fragments, templates, and workflow configs into the workspace and generates `AGENTS.md`.
+This downloads agents, skills, fragments, templates, and workflow configs into `.agentic-workflows/`, `.agents/`, and generates `AGENTS.md`. The workspace directory stays a plain folder — NOT a git repo.
 
 ### Step 4: After bootstrap — start onboarding
 
