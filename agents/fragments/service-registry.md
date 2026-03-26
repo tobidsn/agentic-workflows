@@ -22,7 +22,7 @@
 
 | Service | Command | Working Directory | Entry Point |
 |---------|---------|-------------------|-------------|
-| API | `php artisan serve --port=9191` | `api/` | Laravel (artisan) |
+| API | `php artisan optimize:clear && php artisan optimize && php artisan serve --port=9191` | `api/` | Laravel (artisan) |
 | API Queue | `php artisan queue:work database --timeout=3000 --tries=5 --queue=high,low,default,subscriptions` | `api/` | Laravel queue worker |
 | Frontend | `bun dev` | `web/` | Next.js dev server |
 | AI Service | `source .venv/bin/activate && fastapi dev` | `ai-service/` | `main.py` via fastapi CLI |

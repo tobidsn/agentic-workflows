@@ -173,7 +173,7 @@ start_all() {
 
   # API Server
   if [[ -d "$SCRIPT_DIR/api" ]] && [[ -f "$SCRIPT_DIR/api/.env" ]]; then
-    (cd "$SCRIPT_DIR/api" && php artisan serve --port=9191 > "$LOG_DIR/api.log" 2>&1) &
+    (cd "$SCRIPT_DIR/api" && php artisan optimize:clear && php artisan optimize && php artisan serve --port=9191 > "$LOG_DIR/api.log" 2>&1) &
     save_pid "api" $!
     log_ok "API started on :9191"
   else

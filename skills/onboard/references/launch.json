@@ -4,7 +4,7 @@
     {
       "name": "api",
       "runtimeExecutable": "nix",
-      "runtimeArgs": ["develop", "--command", "bash", "-c", "cd api && php artisan serve --port=9191"],
+      "runtimeArgs": ["develop", "--command", "bash", "-c", "cd api && php artisan optimize:clear && php artisan optimize && php artisan serve --port=9191"],
       "port": 9191
     },
     {
