@@ -167,102 +167,168 @@ Neither is required. Workflow works without them.
 
 ---
 
-## Step 2: Install Nix and Enter Dev Shell
+## Step 2: Set Up Development Environment
 
-**Nix is REQUIRED. Do NOT fall back to system-installed tools.** All dependencies (PHP, Bun, Node, Python, PostgreSQL, Redis, etc.) are managed through the Nix flake to ensure reproducible builds across all team members.
+Use the ask tool:
 
-### 2.1 Check if Nix is installed and flakes are enabled
+> "How do you want to set up your development environment?"
+> - **Nix** (recommended) — Reproducible, all versions pinned, one command gives you everything
+> - **Direct install** — Use homebrew/manual install on your Mac
+
+Record the choice in `.onboard-state.json` as `"env_method": "nix"` or `"env_method": "direct"`.
+
+---
+
+### Option A: Nix
+
+#### A.1 Check if Nix is installed and flakes are enabled
 
 ```bash
 command -v nix &>/dev/null && echo "✓ Nix installed: $(nix --version)" || echo "✗ Nix not found"
 ```
 
-If Nix IS installed, ensure flakes are enabled (idempotent — safe to run multiple times):
+If Nix IS installed, ensure flakes are enabled (idempotent):
 
 ```bash
 mkdir -p ~/.config/nix
 grep -q 'experimental-features' ~/.config/nix/nix.conf 2>/dev/null || echo 'experimental-features = nix-command flakes' >> ~/.config/nix/nix.conf
 ```
 
-Verify flakes work:
-```bash
-nix flake --help &>/dev/null && echo "✓ Flakes enabled" || echo "✗ Flakes not enabled — check ~/.config/nix/nix.conf"
-```
+If Nix is installed and flakes work, skip to A.3.
 
-If Nix is installed and flakes work, skip to Step 2.3.
+#### A.2 If Nix is NOT installed — **STOP, wait for user**
 
-### 2.2 If Nix is NOT installed — **STOP, wait for user**
+Nix requires `sudo`. The agent CANNOT install it headlessly. Use the ask tool:
 
-Nix requires `sudo` and an interactive terminal. The agent CANNOT install it headlessly.
-
-Tell the user (use the ask tool):
-
-> "Nix is not installed. It requires sudo so you must run the installer yourself.
-> Please run this in a separate terminal:
->
+> "Nix is not installed. Please run this in a separate terminal:
 > ```
 > curl -L https://nixos.org/nix/install | sh
 > ```
->
 > **Let me know when the installation finishes.**"
 
-**DO NOT proceed to the next step.** Wait for the user to confirm Nix is installed. Use the ask tool to ask:
-
+**STOP AND WAIT.** Use the ask tool:
 > "Have you installed Nix?"
 > - Yes, it's installed
 > - Not yet, I need more time
-> - I need help with the installation
 
-Only continue when user confirms "Yes". If "Not yet", wait. If "Need help", troubleshoot.
-
-After confirmation, **enable flakes permanently** (no sudo needed, idempotent):
-
+After confirmation, enable flakes:
 ```bash
 mkdir -p ~/.config/nix
 grep -q 'experimental-features' ~/.config/nix/nix.conf 2>/dev/null || echo 'experimental-features = nix-command flakes' >> ~/.config/nix/nix.conf
 ```
 
-Then verify (use full path if PATH hasn't refreshed):
-
+Verify (use full path if PATH hasn't refreshed):
 ```bash
-# Try PATH first, fall back to full path
 NIX_CMD=$(command -v nix 2>/dev/null || echo "/nix/var/nix/profiles/default/bin/nix")
 $NIX_CMD --version
 ```
 
-If still not found, do NOT continue. Ask the user to check their shell path.
+#### A.3 Enter the Nix dev shell
 
-### 2.3 Enter the Nix dev shell — agent does this directly
-
-The agent MUST enter `nix develop` as its active shell. This is NOT optional and NOT deferred to the user.
-
-**Run this command directly:**
+The agent runs this directly:
 ```bash
 NIX_CMD=$(command -v nix 2>/dev/null || echo "/nix/var/nix/profiles/default/bin/nix")
 $NIX_CMD develop
 ```
 
-**The first time may take 5-15 minutes** as Nix downloads all packages. This is normal. Use a long timeout (600s). DO NOT panic, cancel, or retry while it's building.
+**First time may take 5-15 minutes** (downloading packages). Use a long timeout (600s). DO NOT panic or retry.
 
-After `nix develop` completes, the agent's shell now has all tools available. **All subsequent commands run directly — no more `nix develop --command` wrappers needed.**
+After completion, all tools are in PATH. All subsequent commands run directly — no wrappers needed.
 
-### 2.4 Verify tools are available
-
-Run this directly in the shell (should work now that you're inside nix develop):
+#### A.4 Verify tools
 
 ```bash
-php --version && composer --version && bun --version && node --version && python3 --version && uv --version && psql --version
+php --version && composer --version && bun --version && node --version && python3 --version && uv --version && psql --version && redis-cli --version
 ```
 
-**If any tool is missing, something is wrong with the flake — do NOT install tools manually.** Fix the `flake.nix` instead.
+If anything is missing, fix `flake.nix` — do NOT install manually.
 
-### 2.5 All subsequent commands run in this shell
+#### A.5 All subsequent commands run in this shell
 
-The agent is now inside `nix develop`. All commands from this point (deps, migrations, run-all.sh, etc.) run directly — no wrappers, no `nix develop --command`.
+> **Do NOT use brew, apt, pip install --global, npm install -g.** Everything comes from Nix.
 
-> **Do NOT use brew, apt, pip install --global, npm install -g, or any other system package manager.** Everything comes from Nix.
+---
 
-If Nix was freshly installed this session, remind user at the end: "After onboarding, restart your terminal so `nix` is in your PATH for future sessions."
+### Option B: Direct Install (Homebrew)
+
+#### B.1 Check what's already installed
+
+```bash
+echo "=== Runtimes ==="
+for cmd in php bun node python3; do
+  command -v "$cmd" &>/dev/null && echo "✓ $cmd: $($cmd --version 2>&1 | head -1)" || echo "✗ $cmd: NOT FOUND"
+done
+
+echo "=== Package Managers ==="
+for cmd in composer uv pip; do
+  command -v "$cmd" &>/dev/null && echo "✓ $cmd" || echo "✗ $cmd: NOT FOUND"
+done
+
+echo "=== Databases & Services ==="
+for cmd in psql redis-cli mailhog; do
+  command -v "$cmd" &>/dev/null && echo "✓ $cmd" || echo "✗ $cmd: NOT FOUND"
+done
+
+echo "=== Dev Tools ==="
+for cmd in git gh; do
+  command -v "$cmd" &>/dev/null && echo "✓ $cmd" || echo "✗ $cmd: NOT FOUND"
+done
+```
+
+#### B.2 Install missing tools
+
+For each missing tool, the agent runs the install command directly. If `brew` is not installed, tell user to install it first: https://brew.sh
+
+| Tool | Install Command |
+|------|----------------|
+| PHP 8.5 | `brew install php` |
+| Composer | `brew install composer` |
+| Bun | `brew install oven-sh/bun/bun` |
+| Node 22 | `brew install node@22` |
+| Python 3.12 | `brew install python@3.12` |
+| uv | `brew install uv` |
+| PostgreSQL | `brew install postgresql@18` |
+| Redis | `brew install redis` |
+| Mailhog | `brew install mailhog` |
+| git | `brew install git` |
+| gh | `brew install gh` |
+
+Run the installs for missing tools. **The agent does this directly** — do NOT ask user to run them.
+
+#### B.3 Start database services (if not already running)
+
+```bash
+# Start PostgreSQL
+brew services start postgresql@18
+
+# Start Redis
+brew services start redis
+
+# Verify
+pg_isready -h localhost -p 5432 && echo "✓ PostgreSQL running" || echo "✗ PostgreSQL not running"
+redis-cli ping && echo "✓ Redis running" || echo "✗ Redis not running"
+```
+
+#### B.4 Install pgvector extension
+
+```bash
+# pgvector for AI service vector search
+psql -h localhost -p 5432 -d postgres -c "CREATE EXTENSION IF NOT EXISTS vector;" 2>/dev/null || echo "pgvector may need manual install: brew install pgvector"
+```
+
+#### B.5 Verify all tools
+
+```bash
+php --version && composer --version && bun --version && node --version && python3 --version && uv --version && psql --version && redis-cli --version
+```
+
+All tools must be available. If any are missing, troubleshoot before continuing.
+
+---
+
+### After either option — record and continue
+
+Save the environment method in `.onboard-state.json` and proceed to Step 3. All subsequent steps (clone, deps, .env, DB) work the same regardless of Nix or direct install.
 
 ## Step 3: Verify Model Access
 
@@ -530,16 +596,28 @@ ln -sf ../.agents/skills .cursor/skills
 
 For tools that support `launch.json` (Claude Code Desktop), generate the dev server config so the agent can start/stop/preview services automatically.
 
-1. Read the template from [references/launch.json](references/launch.json)
-2. **Remove entries for services the user didn't select** in Step 1
-3. Write to `.claude/launch.json`:
+**Check `env_method` from `.onboard-state.json`** to determine the format:
 
-```bash
-mkdir -p .claude
-cp .agents/skills/onboard/references/launch.json .claude/launch.json
+**If Nix:** Use `nix develop --command` wrapper (works even outside nix shell):
+1. Read template from [references/launch.json](references/launch.json) — this is the nix-wrapped version
+2. Remove entries for services the user didn't select
+3. Write to `.claude/launch.json`
+
+**If Direct install:** Write launch.json with commands directly (tools are in system PATH):
+```json
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "api", "runtimeExecutable": "php", "runtimeArgs": ["artisan", "serve", "--port=9191"], "cwd": "api", "port": 9191 },
+    { "name": "api-queue", "runtimeExecutable": "php", "runtimeArgs": ["artisan", "queue:work", "database", "--timeout=3000", "--tries=5", "--queue=high,low,default,subscriptions"], "cwd": "api" },
+    { "name": "web", "runtimeExecutable": "bun", "runtimeArgs": ["run", "dev"], "cwd": "web", "port": 3000 },
+    { "name": "ai-service", "runtimeExecutable": "fastapi", "runtimeArgs": ["dev"], "cwd": "ai-service", "port": 8000 },
+    { "name": "data-service", "runtimeExecutable": "uvicorn", "runtimeArgs": ["app.main:app", "--reload", "--port", "9999"], "cwd": "data-service", "port": 9999 }
+  ]
+}
 ```
 
-4. Edit the file to remove unselected services
+Remove entries for unselected services, then write to `.claude/launch.json`.
 
 The template configures:
 
