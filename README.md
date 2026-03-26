@@ -78,15 +78,15 @@ This repo is the single source of truth for frndOS AI agent instructions. It is 
 
 ### Workflow State Machine
 
-10 phases with gate enforcement — each phase has a dedicated agent and model assignment.
+11 phases with gate enforcement — each phase has a dedicated agent and model assignment.
 
-[![Workflow State Machine](https://excalidraw.com/api/og?scene=59CtKI6JR7GEwpVorx-rb)](https://excalidraw.com/#json=59CtKI6JR7GEwpVorx-rb,Lz2F66p-HZuPHcuXwNYAGQ)
+![Workflow State Machine](./docs/workflow-state-machine.svg)
 
 ### Agent Architecture
 
 Phase-scoped agents with auto-delegation — orchestra routes, sub-agents do the work.
 
-[![Agent Architecture](https://excalidraw.com/api/og?scene=xs01BKkEeR7Zh4SAZEEoV)](https://excalidraw.com/#json=xs01BKkEeR7Zh4SAZEEoV,7T34Kh2EZmoalN6yA2ZYbg)
+![Agent Architecture](./docs/agent-architecture.svg)
 
 ### How auto-update works
 

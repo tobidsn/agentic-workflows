@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 460" font-family="'Segoe UI', system-ui, -apple-system, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 3.5 L 0 7 z" fill="#444"/>
+    </marker>
+    <marker id="arrow-purple" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 3.5 L 0 7 z" fill="#9c36b5"/>
+    </marker>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="116%">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Title -->
+  <text x="500" y="32" text-anchor="middle" font-size="22" font-weight="700" fill="#1e1e1e">frndOS Agent Architecture</text>
+  <text x="500" y="54" text-anchor="middle" font-size="13" fill="#757575">Phase-scoped agents with auto-delegation</text>
+
+  <!-- Orchestration Layer zone -->
+  <rect x="220" y="68" width="480" height="82" rx="12" fill="#e5dbff" stroke="#9c36b5" stroke-width="1" opacity="0.35"/>
+  <text x="232" y="82" font-size="11" fill="#7048a0" font-weight="600">ORCHESTRATION LAYER</text>
+
+  <!-- Developer -->
+  <rect x="30" y="88" width="140" height="48" rx="10" fill="#fff3bf" stroke="#f08c00" stroke-width="2" filter="url(#shadow)"/>
+  <text x="100" y="117" text-anchor="middle" font-size="15" font-weight="600" fill="#1e1e1e">Developer</text>
+  <line x1="170" y1="112" x2="250" y2="112" stroke="#f08c00" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="210" y="105" text-anchor="middle" font-size="11" fill="#946100">command</text>
+
+  <!-- Orchestra Agent -->
+  <rect x="255" y="90" width="260" height="48" rx="10" fill="#d0bfff" stroke="#9c36b5" stroke-width="2" filter="url(#shadow)"/>
+  <text x="385" y="119" text-anchor="middle" font-size="17" font-weight="700" fill="#1e1e1e">frndos-orchestra</text>
+
+  <!-- Delegation arrows -->
+  <line x1="310" y1="138" x2="100" y2="190" stroke="#9c36b5" stroke-width="1.5" stroke-dasharray="6 3" marker-end="url(#arrow-purple)"/>
+  <line x1="340" y1="138" x2="260" y2="190" stroke="#9c36b5" stroke-width="1.5" stroke-dasharray="6 3" marker-end="url(#arrow-purple)"/>
+  <line x1="375" y1="138" x2="435" y2="190" stroke="#9c36b5" stroke-width="1.5" stroke-dasharray="6 3" marker-end="url(#arrow-purple)"/>
+  <line x1="410" y1="138" x2="600" y2="190" stroke="#9c36b5" stroke-width="1.5" stroke-dasharray="6 3" marker-end="url(#arrow-purple)"/>
+  <line x1="445" y1="138" x2="765" y2="190" stroke="#9c36b5" stroke-width="1.5" stroke-dasharray="6 3" marker-end="url(#arrow-purple)"/>
+  <line x1="475" y1="138" x2="905" y2="190" stroke="#9c36b5" stroke-width="1.5" stroke-dasharray="6 3" marker-end="url(#arrow-purple)"/>
+
+  <!-- Sub-Agent Layer zone -->
+  <rect x="20" y="180" width="950" height="120" rx="12" fill="#d3f9d8" stroke="#2f9e44" stroke-width="1" opacity="0.3"/>
+  <text x="32" y="194" font-size="11" fill="#15803d" font-weight="600">SUB-AGENT LAYER (phase-scoped)</text>
+
+  <!-- Sub-agents -->
+  <rect x="30" y="208" width="140" height="46" rx="10" fill="#a5d8ff" stroke="#1971c2" stroke-width="2" filter="url(#shadow)"/>
+  <text x="100" y="236" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">frndos-prd</text>
+  <text x="100" y="268" text-anchor="middle" font-size="11" fill="#757575">PRD Creation</text>
+
+  <rect x="185" y="208" width="170" height="46" rx="10" fill="#d0bfff" stroke="#9c36b5" stroke-width="2" filter="url(#shadow)"/>
+  <text x="270" y="236" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">frndos-wireframe</text>
+  <text x="270" y="268" text-anchor="middle" font-size="11" fill="#757575">Wireframe</text>
+
+  <rect x="370" y="208" width="155" height="46" rx="10" fill="#b2f2bb" stroke="#2f9e44" stroke-width="2" filter="url(#shadow)"/>
+  <text x="447" y="236" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">frndos-splitter</text>
+  <text x="447" y="268" text-anchor="middle" font-size="11" fill="#757575">PRD Splitting</text>
+
+  <rect x="540" y="208" width="180" height="46" rx="10" fill="#b2f2bb" stroke="#2f9e44" stroke-width="2" filter="url(#shadow)"/>
+  <text x="630" y="236" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">frndos-implement</text>
+  <text x="630" y="268" text-anchor="middle" font-size="11" fill="#757575">Implementation</text>
+
+  <rect x="735" y="208" width="120" height="46" rx="10" fill="#ffd8a8" stroke="#f08c00" stroke-width="2" filter="url(#shadow)"/>
+  <text x="795" y="236" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">frndos-pr</text>
+  <text x="795" y="268" text-anchor="middle" font-size="11" fill="#757575">PR + Reviews</text>
+
+  <rect x="870" y="208" width="130" height="46" rx="10" fill="#ffc9c9" stroke="#e03131" stroke-width="2" filter="url(#shadow)"/>
+  <text x="935" y="236" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">frndos-track</text>
+  <text x="935" y="268" text-anchor="middle" font-size="11" fill="#757575">Completion</text>
+
+  <!-- Skills Layer zone -->
+  <rect x="20" y="320" width="950" height="72" rx="12" fill="#dbe4ff" stroke="#1971c2" stroke-width="1" opacity="0.3"/>
+  <text x="32" y="334" font-size="11" fill="#2563eb" font-weight="600">SKILLS LAYER</text>
+
+  <rect x="40" y="348" width="120" height="32" rx="8" fill="#a5d8ff" stroke="#1971c2" stroke-width="1"/>
+  <text x="100" y="369" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">/onboard</text>
+
+  <rect x="175" y="348" width="120" height="32" rx="8" fill="#a5d8ff" stroke="#1971c2" stroke-width="1"/>
+  <text x="235" y="369" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">/workflow</text>
+
+  <rect x="310" y="348" width="90" height="32" rx="8" fill="#a5d8ff" stroke="#1971c2" stroke-width="1"/>
+  <text x="355" y="369" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">/prd</text>
+
+  <rect x="415" y="348" width="120" height="32" rx="8" fill="#a5d8ff" stroke="#1971c2" stroke-width="1"/>
+  <text x="475" y="369" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">/prd-split</text>
+
+  <rect x="550" y="348" width="130" height="32" rx="8" fill="#a5d8ff" stroke="#1971c2" stroke-width="1"/>
+  <text x="615" y="369" text-anchor="middle" font-size="13" font-weight="600" fill="#1e1e1e">/wireframe</text>
+</svg>
