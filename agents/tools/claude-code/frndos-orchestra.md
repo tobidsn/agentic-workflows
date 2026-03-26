@@ -30,13 +30,16 @@ Run update check, load state, sync code, health checks, then route.
 
 Before entering the `implementation` phase, detect whether Agent Teams is available:
 
-**Claude Code (Agent Teams available):**
-- You have the `Agent` tool and can spawn teammates
-- Set `agent_teams.strategy = "agent_teams"` in workflow state
-- Use the Agent Teams flow (parallel engineers + architect)
+**Check for Agent Teams support:**
+```bash
+echo $CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS
+```
 
-**Cursor / OpenCode (Agent Teams NOT available):**
-- You do NOT have the `Agent` tool
+**If output is `1` — Agent Teams enabled:**
+- Set `agent_teams.strategy = "agent_teams"` in workflow state
+- Use the Agent Teams flow (natural language team creation with parallel engineers + architect)
+
+**Otherwise — Agent Teams NOT available (Cursor / OpenCode / env var unset):**
 - Set `agent_teams.strategy = "sequential"` (or leave `agent_teams` null)
 - Use the sequential flow (frndos-implement → frndos-pr)
 
@@ -98,7 +101,7 @@ Use `@frndos-prd` to delegate, or spawn via the Task tool for background work.
 
 ## AGENT TEAMS (Claude Code — Parallel Implementation)
 
-When entering `implementation` phase with Agent Teams available, follow this flow:
+When entering `implementation` phase with Agent Teams available (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`), follow this flow using **Claude Code Agent Teams** — persistent teammate sessions with shared task lists and mailbox messaging.
 
 ### Step 1: Initialize state
 
@@ -119,72 +122,86 @@ Determine services from `service_prds` in workflow state. Initialize `agent_team
 
 Only create engineer entries for services that have service PRDs.
 
-### Step 2: Spawn architect
+### Step 2: Create the team
 
-Spawn ONE architect teammate (cross-service reviewer):
-
-```
-Agent({
-  prompt: "You are frndos-architect. Read your agent definition at .agents/agents/frndos-architect.md and follow it completely. Feature: <slug>. Services being implemented: <list>. Branch: <branch>. You will be assigned reviews as engineers finish.",
-  description: "frndos-architect: integration reviewer"
-})
-```
-
-### Step 3: Spawn engineers
-
-Spawn one engineer per service **in parallel** (use multiple Agent tool calls in one message):
+Create the entire team in a single natural language prompt. This spawns all teammates as persistent sessions:
 
 ```
-Agent({
-  prompt: "You are frndos-engineer for the <service> service. Read your agent definition at .agents/agents/frndos-engineer.md. Service: <service>. Directory: <dir>/. Service PRD: <path>. Track file: <path>. Branch: <branch>. Target branch: <target>. Feature slug: <slug>. Worker: <worker>. Present your implementation plan and WAIT for approval before coding.",
-  description: "<service>-engineer: implement <service>"
-})
+Create an agent team called "frndos-<slug>" with the following teammates:
+
+1. **architect** — Cross-service integration reviewer
+   - Spawn prompt: "You are frndos-architect. Read your agent definition at .agentic-workflows/agents/tools/claude-code/frndos-architect.md and follow it completely. Feature: <slug>. Services being implemented: <service-list>. Branch: <branch>. You will be assigned reviews as engineers finish via mailbox."
+   - Plan approval required: yes
+
+2. **<service>-engineer** (one per service) — Per-service implementer
+   - Spawn prompt: "You are frndos-engineer for the <service> service. Read your agent definition at .agentic-workflows/agents/tools/claude-code/frndos-engineer.md. Service: <service>. Directory: <dir>/. Service PRD: <path>. Track file: <path>. Branch: <branch>. Target branch: <target>. Feature slug: <slug>. Worker: <worker>."
+   - Plan approval required: yes
 ```
 
 **Target branches per service:**
 - `api`, `web` → `develop`
 - `ai-service`, `data-service` → `development`
 
-### Step 4: Require plan approval
+### Step 3: Create shared task list
 
-Each engineer presents their implementation plan. You (the lead) must approve each plan before the engineer starts coding. Review the plans for:
+Create a shared task list with per-service task chains and dependencies:
+
+For each service, create this chain:
+```
+<service>-plan → <service>-implement → <service>-self-review → <service>-architect-review → <service>-pr
+```
+
+Set dependencies:
+- `<service>-implement` depends on `<service>-plan`
+- `<service>-self-review` depends on `<service>-implement`
+- `<service>-architect-review` depends on `<service>-self-review`
+- `<service>-pr` depends on `<service>-architect-review`
+
+### Step 4: Approve plans
+
+Teammates spawned with plan approval required are in **read-only plan mode** until you approve. Each engineer will present their implementation plan automatically.
+
+Review each plan for:
 - Alignment with service PRD
 - Reasonable task ordering
 - No scope creep
 
+Approve each engineer's plan to unblock them from read-only mode.
+
 ### Step 5: Coordinate architect reviews
 
-When an engineer messages "done implementing, self-review passed":
+When an engineer messages you via mailbox: "Done implementing, self-review passed. Ready for architect review.":
 1. Update that engineer's status in `.workflow-state.json` to `architect_review`
-2. Assign the architect to review that service:
-   - Message the architect: "Review <service>-engineer's implementation. Service: <service>. Directory: <dir>/."
+2. Message the architect via mailbox: "Review <service>-engineer's implementation. Service: <service>. Directory: <dir>/."
 3. The architect reviews incrementally — do NOT wait for all engineers to finish
 
 ### Step 6: Handle architect feedback
 
-Based on architect's review:
-- **Approve:** Update engineer status, tell engineer to create PR
-- **Request changes:** Relay specifics to engineer, wait for fixes, re-request architect review
-- **Hold:** Inform engineer to wait, track the dependency, clear hold when resolved
+The architect messages you via mailbox with the review outcome. Based on feedback:
+- **Approve:** Update engineer status, message the engineer via mailbox: "Architect approved. Create your PR."
+- **Request changes:** Message the engineer via mailbox with specific issues from the architect, wait for the engineer to message back with fixes, then message the architect to re-review
+- **Hold:** Message the engineer via mailbox to wait, track the dependency, message the engineer to clear hold when resolved
 
 ### Step 7: Track PR creation and review
 
-When an engineer reports they're creating a PR:
+When an engineer messages you via mailbox that they're creating a PR:
 1. Update engineer status to `creating_pr` in `.workflow-state.json`
-2. When engineer reports the PR URL:
+2. When engineer messages the PR URL via mailbox:
    - Set `pr_urls.<service>` in `.workflow-state.json`
    - Set `agent_teams.engineers.<service>.pr_url` to the same URL
    - Update engineer status to `pr_feedback`
-3. When engineer reports "PR merged. Done.":
+3. When engineer messages "PR merged. Done." via mailbox:
    - Update engineer status to `done`
 
-### Step 8: Transition to completion
+### Step 8: Cleanup and transition to completion
 
 When ALL engineers report "PR merged. Done.":
 1. Verify all entries in `pr_urls` have merged PRs
 2. Verify all engineers have status `done`
-3. Transition phase to `completion`
-4. Delegate to `frndos-track` for cleanup
+3. **Shut down all teammates** — instruct each teammate to stop
+4. **Clean up the team** — "Clean up the frndos-<slug> team"
+5. Transition phase to `completion`
+6. Delegate to `frndos-track` (subagent) for cleanup
 
 ## RULES
 

@@ -68,10 +68,33 @@ When picking up another person's feature:
 
 When Claude Code's Agent Teams are available, the `implementation` phase uses parallel per-service engineers instead of a single sequential `frndos-implement` agent.
 
-**When it activates:**
-- Claude Code only (Cursor/OpenCode use the sequential fallback)
-- Orchestra detects the `Agent` tool is available
-- Sets `agent_teams.strategy = "agent_teams"` in workflow state
+**Detection — env var, NOT Agent tool:**
+- Check `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` env var
+- If `1`: Agent Teams is enabled — use natural language team creation
+- Otherwise: fall back to sequential flow (frndos-implement → frndos-pr)
+- Cursor/OpenCode always use the sequential fallback
+
+**Mechanism — natural language team creation:**
+- The lead creates the entire team via a single natural language prompt describing all teammates
+- Each teammate is a persistent session (NOT a subagent) with its own context
+- Teammates are spawned with their instruction file path in the spawn prompt
+- Teammates load CLAUDE.md and read their instruction files on startup
+
+**Shared task list:**
+- The lead creates a shared task list with per-service task chains and dependencies
+- Chain per service: `plan → implement → self-review → architect-review → pr`
+- Dependencies enforce ordering within each chain
+
+**Mailbox messaging:**
+- All inter-teammate communication uses the mailbox
+- `message` for 1:1 (lead ↔ engineer, architect ↔ engineer)
+- `broadcast` for all teammates (use sparingly)
+
+**Plan approval — built-in:**
+- Teammates spawned with plan approval required start in **read-only plan mode**
+- They automatically present their plan and request approval
+- Lead reviews and approves — engineer stays read-only until approved
+- This prevents scope creep and ensures alignment with service PRDs
 
 **Transition shortcut:**
 - Agent Teams: `implementation` → `completion` (skips `pr_submission` + `pr_review`)
@@ -85,14 +108,19 @@ When Claude Code's Agent Teams are available, the `implementation` phase uses pa
 - Engineers MUST NOT write code outside their assigned service
 - Architect reviews integration across services as engineers finish
 
-**Plan approval:**
-- Lead MUST approve each engineer's implementation plan before they start coding
-- This prevents scope creep and ensures alignment with service PRDs
-
 **Self-review mandate:**
 - Every engineer MUST self-review their own code before notifying the lead
 - Self-review covers: bugs, patterns, conventions, security
 - Architect review covers: cross-service integration only (NOT code quality)
+
+**Team cleanup:**
+- When all engineers report done, the lead MUST shut down all teammates
+- After shutting down teammates, the lead runs "Clean up the team"
+- Only then does the lead transition to `completion` phase
+
+**Limitations:**
+- One team per session — do NOT create multiple teams
+- No session resumption for in-process teammates — if a session is lost, the teammate must be re-created
 
 **Engineer status flow:**
 ```
