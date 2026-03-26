@@ -1,5 +1,5 @@
 {
-  "version": "2.0.33",
+  "version": "2.0.34",
   "updated": "2026-03-26",
   "files": {
     "agents/fragments/session-protocol.md": {
@@ -148,7 +148,7 @@
       "type": "agent"
     },
     "agents/tools/claude-code/frndos-wireframe.md": {
-      "sha256": "fa052cdeb63d2f67904bba019f0f66c8f5356f4610d7fa1de2681f32e37fe048",
+      "sha256": "209f091b6cc236d6f9c475570e3c1a12ab611a7dfbd7f88bfe1350a972301c12",
       "install_to": ".agents/agents/frndos-wireframe.md",
       "type": "agent"
     },
