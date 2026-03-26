@@ -397,7 +397,47 @@ Use the ask tool:
 
 **The user can continue onboarding with missing .env files, but `/workflow start` will block until ALL are provided.**
 
-## Step 7: Database Setup — **STOP, ask user**
+## Step 7: Initialize Local Databases & Services
+
+### 7.1 Initialize PostgreSQL data directory (one-time)
+
+PostgreSQL from nix needs a local data directory. This is a one-time setup:
+
+```bash
+NIX_CMD=$(command -v nix 2>/dev/null || echo "/nix/var/nix/profiles/default/bin/nix")
+
+# Initialize PostgreSQL data directory (skip if already exists)
+if [ ! -d ".pgdata" ]; then
+  $NIX_CMD develop --command bash -c "initdb -D .pgdata"
+  echo "✓ PostgreSQL data directory created at .pgdata/"
+fi
+```
+
+Then start PostgreSQL and enable pgvector:
+
+```bash
+# Start PostgreSQL in background
+$NIX_CMD develop --command bash -c "pg_ctl -D .pgdata -l .logs/postgresql.log start"
+
+# Wait for it to be ready
+sleep 2
+$NIX_CMD develop --command bash -c "pg_isready -h localhost -p 5432"
+
+# Enable pgvector extension (one-time, for AI service vector search)
+$NIX_CMD develop --command bash -c "psql -h localhost -p 5432 -d postgres -c 'CREATE EXTENSION IF NOT EXISTS vector;'" 2>/dev/null || true
+```
+
+### 7.2 Start Redis
+
+```bash
+# Start Redis in background
+$NIX_CMD develop --command bash -c "redis-server --daemonize yes --logfile .logs/redis.log"
+
+# Verify
+$NIX_CMD develop --command bash -c "redis-cli ping"
+```
+
+### 7.3 Restore database dump — **STOP, ask user**
 
 Use the ask tool:
 
@@ -485,6 +525,36 @@ ln -sf ../.agents/skills .cursor/skills
 ```
 
 **OpenCode:** Similar symlink check for `.opencode/`.
+
+### Dev Server Configuration (launch.json)
+
+For tools that support `launch.json` (Claude Code Desktop), generate the dev server config so the agent can start/stop/preview services automatically.
+
+1. Read the template from [references/launch.json](references/launch.json)
+2. **Remove entries for services the user didn't select** in Step 1
+3. Write to `.claude/launch.json`:
+
+```bash
+mkdir -p .claude
+cp .agents/skills/onboard/references/launch.json .claude/launch.json
+```
+
+4. Edit the file to remove unselected services
+
+The template configures:
+
+| Name | Command | cwd | Port |
+|------|---------|-----|------|
+| postgresql | `postgres -D .pgdata -k /tmp` | workspace root | 5432 |
+| redis | `redis-server` | workspace root | 6379 |
+| mailhog | `mailhog` | workspace root | 8025 |
+| api | `php artisan serve --port=9191` | `api/` | 9191 |
+| api-queue | `php artisan queue:work database ...` | `api/` | — |
+| web | `bun run dev` | `web/` | 3000 |
+| ai-service | `fastapi dev` | `ai-service/` | 8000 |
+| data-service | `uvicorn app.main:app --reload --port 9999` | `data-service/` | 9999 |
+
+All commands are wrapped with `nix develop --command` so they work even outside the nix shell. Infrastructure services (PostgreSQL, Redis) should start before app services.
 
 ## Step 10: Install Community Skills
 

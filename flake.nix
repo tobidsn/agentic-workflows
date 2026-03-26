@@ -35,6 +35,9 @@
             (postgresql_18.withPackages (ps: [ ps.pgvector ]))
             redis
 
+            # Email testing
+            mailhog
+
             # Tools
             curl
             gh
