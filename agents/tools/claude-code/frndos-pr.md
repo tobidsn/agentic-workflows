@@ -35,16 +35,30 @@ The wireframe is built on `wireframe/vc-<slug>` branch. Create a PR to `develop`
    - Wireframe `metadata.json` for each wireframe page
    - List all files created under `web/src/app/(dashboard)/wireframes/<slug>/`
 
-3. **Draft PR using template:**
+3. **Before drafting the PR — confirm user satisfaction.** Use the ask tool:
+
+   > "Before I create the wireframe PR, let's make sure everything is aligned. Please review:
+   > - The wireframe pages I created
+   > - The components and layout used
+   > - The placeholder data
+   >
+   > Are you satisfied with the wireframe work and ready to submit for FE review?"
+   > - Yes, looks good — create the PR
+   > - No, I want to make changes first
+   > - Let me review it again
+
+   **STOP AND WAIT.** If user wants changes → go back to wireframe editing. Only proceed when user confirms satisfaction.
+
+4. **Draft PR using template:**
    - Read template from `.agentic-workflows/templates/pr/wireframe-pr.template.md`
    - Fill in: feature title, slug, PRD path, wireframe page list, components used
    - **Title:** `wireframe(<slug>): <feature-title>`
    - **Target:** `develop`
 
-4. **Present PR draft** — show title + body to user
-5. **Wait for approval**
+5. **Present PR draft** — show title + body to user
+6. **Wait for approval of PR content**
 
-6. **Create PR:**
+7. **Create PR:**
    ```bash
    gh pr create --title "wireframe(<slug>): <feature-title>" --body "<body>" --base develop
    ```
@@ -103,16 +117,30 @@ The feature is implemented on `feature/vc-<slug>` branch. Create PR(s) targeting
    - Track files for completed tasks
    - Git log for commit history
 
-3. **Draft PR using template:**
+3. **Before drafting the PR — confirm user satisfaction.** Use the ask tool:
+
+   > "Before I create the feature PR, let's make sure the implementation is complete and aligned:
+   > - All tasks from the service PRD are done
+   > - Track file is up to date
+   > - Code follows service conventions
+   >
+   > Are you satisfied with the implementation and ready to submit for review?"
+   > - Yes, everything looks good — create the PR
+   > - No, there's more work to do
+   > - Let me review the changes first
+
+   **STOP AND WAIT.** If user wants more work → go back to implementation. Only proceed when user confirms.
+
+4. **Draft PR using template:**
    - Read template from `.agentic-workflows/templates/pr/feature-pr.template.md`
    - Fill in: title, summary, PRD links, wireframe link, changes, tasks completed
    - **Title:** `feat(<service>): <feature-title> — <brief description>`
    - **Target:** `develop` for api/web, `development` for ai-service/data-service
 
-4. **Present PR draft** — show title + body to user
-5. **Wait for approval**
+5. **Present PR draft** — show title + body to user
+6. **Wait for approval of PR content**
 
-6. **Create PR:**
+7. **Create PR:**
    ```bash
    gh pr create --title "<title>" --body "<body>" --base <target-branch>
    ```
