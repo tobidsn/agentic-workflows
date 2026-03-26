@@ -82,6 +82,16 @@
       "install_to": ".agentic-workflows/templates/tracks/feature.track.template.md",
       "type": "template"
     },
+    "templates/pr/wireframe-pr.template.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/templates/pr/wireframe-pr.template.md",
+      "type": "template"
+    },
+    "templates/pr/feature-pr.template.md": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agentic-workflows/templates/pr/feature-pr.template.md",
+      "type": "template"
+    },
     "skills/onboard/SKILL.md": {
       "sha256": "914de3f450ebb29958e32e9b8b56cce5d4ceca4bcdc96622d3fbd144c05338ff",
       "install_to": ".agents/skills/onboard/SKILL.md",
