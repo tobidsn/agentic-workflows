@@ -623,11 +623,15 @@ done
 
 ## Step 9: Configure Editor Tooling
 
-The bootstrap already installed frndOS agents and skills to `.agents/` (Claude Code) and `.agentic-workflows/agents/` (Cursor/OpenCode), with symlinks to `.claude/`, `.cursor/`, `.opencode/`.
+The bootstrap installed frndOS agents to `.agentic-workflows/agents/<tool>/` and skills to `.agents/skills/`. Each tool symlinks to its platform-specific agents.
 
 **Additional per-tool setup:**
 
-**Claude Code:** Verify `CLAUDE.md` symlink exists → `AGENTS.md`. Agents are in `.agents/agents/`.
+**Claude Code:** Verify `CLAUDE.md` symlink exists → `AGENTS.md`. Agents symlinked from `.agentic-workflows/agents/claude-code/`:
+```bash
+mkdir -p .agents
+ln -sf ../.agentic-workflows/agents/claude-code .agents/agents
+```
 
 **Cursor:** If user selected Cursor, check `.cursor/agents/` symlink exists pointing to Cursor-specific `.mdc` agents. If not:
 ```bash

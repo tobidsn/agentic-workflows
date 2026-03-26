@@ -258,15 +258,24 @@ if [[ "$FRAGMENTS_CHANGED" == true ]]; then
 fi
 
 # ── Create symlinks for tool compatibility ───────────────────────────────────
-# .agents/ is the universal path. Symlink tool-specific dirs to it.
+# .agentic-workflows/agents/<tool>/ is the source for each tool's agents.
+# .agents/ only contains skills/. Each tool symlinks agents from .agentic-workflows/.
 header "Setting up tool compatibility symlinks"
 
-# Claude Code: .claude/agents/ → .agents/agents/, .claude/skills/ → .agents/skills/
-if [[ -d "$WORKSPACE_ROOT/.agents/agents" ]]; then
+# Claude Code: .agents/agents/ → .agentic-workflows/agents/claude-code/
+if [[ -d "$WORKSPACE_ROOT/.agentic-workflows/agents/claude-code" ]]; then
+  mkdir -p "$WORKSPACE_ROOT/.agents"
+  if [[ ! -e "$WORKSPACE_ROOT/.agents/agents" ]]; then
+    ln -s "../.agentic-workflows/agents/claude-code" "$WORKSPACE_ROOT/.agents/agents"
+    ok "Symlinked .agents/agents/ → .agentic-workflows/agents/claude-code/"
+  fi
+fi
+# Claude Code also reads from .claude/
+if [[ -d "$WORKSPACE_ROOT/.agentic-workflows/agents/claude-code" ]]; then
   mkdir -p "$WORKSPACE_ROOT/.claude"
   if [[ ! -e "$WORKSPACE_ROOT/.claude/agents" ]]; then
-    ln -s "../.agents/agents" "$WORKSPACE_ROOT/.claude/agents"
-    ok "Symlinked .claude/agents/ → .agents/agents/"
+    ln -s "../.agentic-workflows/agents/claude-code" "$WORKSPACE_ROOT/.claude/agents"
+    ok "Symlinked .claude/agents/ → .agentic-workflows/agents/claude-code/"
   fi
 fi
 if [[ -d "$WORKSPACE_ROOT/.agents/skills" ]]; then

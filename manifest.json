@@ -139,37 +139,37 @@
     },
     "agents/tools/claude-code/frndos-orchestra.md": {
       "sha256": "0f19628f787b2877398835e625fe46f3c963734fd29df3803ed8783a3e34fc5b",
-      "install_to": ".agents/agents/frndos-orchestra.md",
+      "install_to": ".agentic-workflows/agents/claude-code/frndos-orchestra.md",
       "type": "agent"
     },
     "agents/tools/claude-code/frndos-prd.md": {
       "sha256": "ffb719ad8b11b86c931d984b634f70d8339e8f279a7ea20383cee4da62cc98f0",
-      "install_to": ".agents/agents/frndos-prd.md",
+      "install_to": ".agentic-workflows/agents/claude-code/frndos-prd.md",
       "type": "agent"
     },
     "agents/tools/claude-code/frndos-wireframe.md": {
       "sha256": "209f091b6cc236d6f9c475570e3c1a12ab611a7dfbd7f88bfe1350a972301c12",
-      "install_to": ".agents/agents/frndos-wireframe.md",
+      "install_to": ".agentic-workflows/agents/claude-code/frndos-wireframe.md",
       "type": "agent"
     },
     "agents/tools/claude-code/frndos-splitter.md": {
       "sha256": "b4cdf36dfb9d50cae809765a99a4887125e80f658f4212edc0f7520e93df1711",
-      "install_to": ".agents/agents/frndos-splitter.md",
+      "install_to": ".agentic-workflows/agents/claude-code/frndos-splitter.md",
       "type": "agent"
     },
     "agents/tools/claude-code/frndos-implement.md": {
       "sha256": "fd0acdb8af772294c1f293bebed9b9f7fc8bc44d894eb079a043f53036d38edd",
-      "install_to": ".agents/agents/frndos-implement.md",
+      "install_to": ".agentic-workflows/agents/claude-code/frndos-implement.md",
       "type": "agent"
     },
     "agents/tools/claude-code/frndos-pr.md": {
       "sha256": "36d8e258378b7a4b2aa17f9c3f488f63314c01d298222129ac2b6e924b83f96a",
-      "install_to": ".agents/agents/frndos-pr.md",
+      "install_to": ".agentic-workflows/agents/claude-code/frndos-pr.md",
       "type": "agent"
     },
     "agents/tools/claude-code/frndos-track.md": {
       "sha256": "3612783ccaf9b9229fa27a0f6522c4e3856d50983fd7a64b5b5f2d40b7f8ecc5",
-      "install_to": ".agents/agents/frndos-track.md",
+      "install_to": ".agentic-workflows/agents/claude-code/frndos-track.md",
       "type": "agent"
     },
     "agents/tools/cursor/frndos-orchestra.mdc": {
