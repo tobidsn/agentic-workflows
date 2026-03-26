@@ -1,5 +1,5 @@
 {
-  "version": "2.0.29",
+  "version": "2.0.30",
   "updated": "2026-03-26",
   "files": {
     "agents/fragments/session-protocol.md": {
@@ -93,7 +93,7 @@
       "type": "template"
     },
     "skills/onboard/SKILL.md": {
-      "sha256": "76e7e132f907730faa12f0fe09d544c7fd6c1d563df1f4940d88c1bdffaa94d7",
+      "sha256": "1bbe5cd50a15433e068b64611389a05d2c33cfcffeef5a0464b895a3fcaceb74",
       "install_to": ".agents/skills/onboard/SKILL.md",
       "type": "skill"
     },
@@ -113,7 +113,7 @@
       "type": "reference"
     },
     "skills/onboard/references/launch-direct.json": {
-      "sha256": "PLACEHOLDER",
+      "sha256": "c3ef8a817f047d4a9925b373f7c0bf183ac3ff2d07d17956e119d6aca6de073d",
       "install_to": ".agents/skills/onboard/references/launch-direct.json",
       "type": "reference"
     },
