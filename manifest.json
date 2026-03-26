@@ -112,6 +112,11 @@
       "install_to": ".agents/skills/onboard/references/launch.json",
       "type": "reference"
     },
+    "skills/onboard/references/launch-direct.json": {
+      "sha256": "PLACEHOLDER",
+      "install_to": ".agents/skills/onboard/references/launch-direct.json",
+      "type": "reference"
+    },
     "skills/workflow/SKILL.md": {
       "sha256": "0040f2204a1ca87ea68b90d5947f06dcf8b38ccf070b694a03878b25b47666aa",
       "install_to": ".agents/skills/workflow/SKILL.md",

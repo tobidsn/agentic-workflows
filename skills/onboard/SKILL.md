@@ -644,26 +644,15 @@ For tools that support `launch.json` (Claude Code Desktop), generate the dev ser
 
 **Check `env_method` from `.onboard-state.json`** to determine the format:
 
-**If Nix:** Use `nix develop --command` wrapper (works even outside nix shell):
-1. Read template from [references/launch.json](references/launch.json) — this is the nix-wrapped version
+**If Nix:**
+1. Copy template: `cp .agents/skills/onboard/references/launch.json .claude/launch.json`
 2. Remove entries for services the user didn't select
-3. Write to `.claude/launch.json`
+3. Done — commands are wrapped with `nix develop --command`
 
-**If Direct install:** Write launch.json with commands directly (tools are in system PATH):
-```json
-{
-  "version": "0.0.1",
-  "configurations": [
-    { "name": "api", "runtimeExecutable": "php", "runtimeArgs": ["artisan", "serve", "--port=9191"], "cwd": "api", "port": 9191 },
-    { "name": "api-queue", "runtimeExecutable": "php", "runtimeArgs": ["artisan", "queue:work", "database", "--timeout=3000", "--tries=5", "--queue=high,low,default,subscriptions"], "cwd": "api" },
-    { "name": "web", "runtimeExecutable": "bun", "runtimeArgs": ["run", "dev"], "cwd": "web", "port": 3000 },
-    { "name": "ai-service", "runtimeExecutable": "fastapi", "runtimeArgs": ["dev"], "cwd": "ai-service", "port": 8000 },
-    { "name": "data-service", "runtimeExecutable": "uvicorn", "runtimeArgs": ["app.main:app", "--reload", "--port", "9999"], "cwd": "data-service", "port": 9999 }
-  ]
-}
-```
-
-Remove entries for unselected services, then write to `.claude/launch.json`.
+**If Direct install:**
+1. Copy template: `cp .agents/skills/onboard/references/launch-direct.json .claude/launch.json`
+2. Remove entries for services the user didn't select
+3. Done — commands run directly (tools in system PATH)
 
 The template configures:
 
