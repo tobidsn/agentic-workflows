@@ -1,5 +1,5 @@
 {
-  "version": "2.0.25",
+  "version": "2.0.26",
   "updated": "2026-03-26",
   "files": {
     "agents/fragments/session-protocol.md": {
@@ -83,12 +83,12 @@
       "type": "template"
     },
     "templates/pr/wireframe-pr.template.md": {
-      "sha256": "PLACEHOLDER",
+      "sha256": "e33cd0d57f2d21d239cafd2e74c515f01a269e493d804a056b857a2648ee9eba",
       "install_to": ".agentic-workflows/templates/pr/wireframe-pr.template.md",
       "type": "template"
     },
     "templates/pr/feature-pr.template.md": {
-      "sha256": "PLACEHOLDER",
+      "sha256": "161b668d7c6cc60febd155929e7b03aa46994e6f67d9941ceba08775e4584338",
       "install_to": ".agentic-workflows/templates/pr/feature-pr.template.md",
       "type": "template"
     },
@@ -158,7 +158,7 @@
       "type": "agent"
     },
     "agents/tools/claude-code/frndos-pr.md": {
-      "sha256": "cc945cbbdf559ac2126f77c9230bd952cbde89d25e43493a5b628de6b85e6c55",
+      "sha256": "5369e282806ac6508887a638ddc43ac0f92b8ef384a37fd616f43ae0927b488d",
       "install_to": ".agents/agents/frndos-pr.md",
       "type": "agent"
     },
