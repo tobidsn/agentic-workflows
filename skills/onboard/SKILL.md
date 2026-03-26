@@ -671,24 +671,26 @@ All commands are wrapped with `nix develop --command` so they work even outside 
 
 ## Step 10: Install Community Skills
 
-Skills are installed via [skills.sh](https://skills.sh/) using `npx skills add`. Install based on which services the user works on.
+Skills are installed via [skills.sh](https://skills.sh/) using `npx skills add`.
+
+**IMPORTANT: Always use `--yes` (`-y`) flag** — the skills CLI requires an interactive TTY for prompts. Without `--yes`, the install will hang in agent sessions.
 
 **Always install (cross-service):**
 ```bash
-npx skills add github/awesome-copilot@git-commit              # conventional commit messages
-npx skills add github/awesome-copilot@prd                     # PRD creation
+npx skills add github/awesome-copilot@git-commit -y
+npx skills add github/awesome-copilot@prd -y
 ```
 
 **If user works on Frontend (`web/`):**
 ```bash
-npx skills add anthropics/skills@frontend-design              # production-grade UI
-npx skills add vercel-labs/agent-skills@vercel-react-best-practices  # react best practices
-npx skills add vercel-labs/next-skills@next-best-practices    # next.js best practices
-npx skills add busirocket/agents-skills@busirocket-tailwindcss-v4   # tailwind CSS v4
-npx skills add sickn33/antigravity-awesome-skills@radix-ui-design-system  # accessible components
+npx skills add anthropics/skills@frontend-design -y
+npx skills add vercel-labs/agent-skills@vercel-react-best-practices -y
+npx skills add vercel-labs/next-skills@next-best-practices -y
+npx skills add busirocket/agents-skills@busirocket-tailwindcss-v4 -y
+npx skills add sickn33/antigravity-awesome-skills@radix-ui-design-system -y
 ```
 
-> **Note:** Skill syntax is `owner/repo@skill-name` (not `/`). Browse more at [skills.sh](https://skills.sh/) or search: `npx skills find <query>`.
+> **Note:** Skill syntax is `owner/repo@skill-name`. The `-y` flag skips interactive prompts. Browse more at [skills.sh](https://skills.sh/) or search: `npx skills find <query>`.
 
 ## Step 11: Configure MCP Servers
 
