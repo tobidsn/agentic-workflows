@@ -1,5 +1,5 @@
 {
-  "version": "2.0.22",
+  "version": "2.0.23",
   "updated": "2026-03-26",
   "files": {
     "agents/fragments/session-protocol.md": {
@@ -98,7 +98,7 @@
       "type": "reference"
     },
     "skills/onboard/references/launch.json": {
-      "sha256": "cd4a2f08d911f9f8d6d9dd07002f86b91ffd411fcb947669265970cf3d2d5eb4",
+      "sha256": "cb0125ffe80ba46d0f2729be80b465ca32ae4f77642ff470918931f26ec5e8f4",
       "install_to": ".agents/skills/onboard/references/launch.json",
       "type": "reference"
     },
