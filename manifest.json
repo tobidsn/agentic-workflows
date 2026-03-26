@@ -1,5 +1,5 @@
 {
-  "version": "2.0.37",
+  "version": "2.0.38",
   "updated": "2026-03-26",
   "files": {
     "agents/fragments/session-protocol.md": {
@@ -43,7 +43,7 @@
       "type": "template"
     },
     "scripts/update-check.sh": {
-      "sha256": "a89399061e55d53d73db4cd1b0c6d8cae6bb91ec3f4322563e8870a8ddee265e",
+      "sha256": "2917b47404b6b5234405ab791a59932d7650f71ba8849e3cc2bb5a0d66e2f86f",
       "install_to": ".agentic-workflows/scripts/update-check.sh",
       "type": "script"
     },
@@ -93,7 +93,7 @@
       "type": "template"
     },
     "skills/onboard/SKILL.md": {
-      "sha256": "7bc08f5d8af2633098b3f8286dfedf6fd149fff2037a765c05fbeebcfe7e32e6",
+      "sha256": "d26181749aefd9aa95f0c3a3c3f2561d7c117746b43d995c5b84f353bd76abd9",
       "install_to": ".agents/skills/onboard/SKILL.md",
       "type": "skill"
     },
@@ -138,7 +138,7 @@
       "type": "skill"
     },
     "agents/tools/claude-code/frndos-orchestra.md": {
-      "sha256": "0f19628f787b2877398835e625fe46f3c963734fd29df3803ed8783a3e34fc5b",
+      "sha256": "0ef1a43ae4656b4266ed566a09d64aa6d578cc812c6eda1f968f99e1bf665f70",
       "install_to": ".agentic-workflows/agents/claude-code/frndos-orchestra.md",
       "type": "agent"
     },
