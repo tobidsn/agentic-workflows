@@ -659,20 +659,20 @@ Skills are installed via [skills.sh](https://skills.sh/) using `npx skills add`.
 
 **Always install (cross-service):**
 ```bash
-npx skills add github/awesome-copilot/git-commit        # conventional commit messages
-npx skills add github/awesome-copilot/prd                # PRD creation
+npx skills add github/awesome-copilot@git-commit              # conventional commit messages
+npx skills add github/awesome-copilot@prd                     # PRD creation
 ```
 
 **If user works on Frontend (`web/`):**
 ```bash
-npx skills add anthropics/skills/frontend-design         # production-grade UI
-npx skills add vercel-labs/agent-skills                   # react best practices
-npx skills add vercel-labs/next-skills                    # next.js best practices
-npx skills add busirocket/tailwindcss-v4                  # tailwind CSS v4
-npx skills add radix-ui/design-system                     # accessible components
+npx skills add anthropics/skills@frontend-design              # production-grade UI
+npx skills add vercel-labs/agent-skills@vercel-react-best-practices  # react best practices
+npx skills add vercel-labs/next-skills@next-best-practices    # next.js best practices
+npx skills add busirocket/agents-skills@busirocket-tailwindcss-v4   # tailwind CSS v4
+npx skills add sickn33/antigravity-awesome-skills@radix-ui-design-system  # accessible components
 ```
 
-> Browse more skills at [skills.sh](https://skills.sh/) or use `npx skills add vercel-labs/skills/find-skills`.
+> **Note:** Skill syntax is `owner/repo@skill-name` (not `/`). Browse more at [skills.sh](https://skills.sh/) or search: `npx skills find <query>`.
 
 ## Step 11: Configure MCP Servers
 
