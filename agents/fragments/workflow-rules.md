@@ -57,12 +57,16 @@ When picking up another person's feature:
 3. Agent populates local `.workflow-state.json` with reconstructed state
 4. Continue from where the previous person left off
 
-### Multiple Wireframes per PRD
+### Wireframes and Sub-Pages
 
-- `wireframes` is an array — a PRD can have multiple wireframes
+A wireframe = **one feature page**. Sub-views (create form, detail page, wizard steps) are sub-pages within the same wireframe directory, not separate wireframes.
+
+- `wireframes` is an array, but most PRDs have **one wireframe** with sub-pages inside it
 - Each wireframe has its own `slug`, `owner`, and `approval` status
 - `wireframe_review` gate requires ALL wireframes to be approved
 - Only the wireframe owner (or unassigned) can create/edit a wireframe
+- Do NOT create separate wireframes for sub-views — a "Create" page is a sub-page of the listing wireframe, not its own wireframe
+- Multiple wireframes per PRD is rare — only when the PRD describes truly independent feature pages
 
 ### Always Ask Before Executing
 

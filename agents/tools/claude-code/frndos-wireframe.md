@@ -60,29 +60,41 @@ Import from `@/components/frndos/`:
 
 ### Creating a wireframe:
 
+A wireframe = **one feature page**. If the PRD describes sub-views (create form, detail page, wizard steps), those are **sub-pages within the same wireframe**, NOT separate wireframes.
+
 1. **Read the PRD** for UI/UX requirements and acceptance criteria
 2. **If Figma MCP available** and user provides URL, fetch design specs
-3. **Plan the wireframe:**
+3. **Identify pages from the PRD:**
+   - **Main page:** The primary view (listing, dashboard, settings panel)
+   - **Sub-pages:** Any navigable views described in the PRD (create, detail, edit, wizard)
+   - These all go in ONE wireframe directory
+4. **Plan the wireframe:**
    - List which components you'll use
-   - Describe the page layout
+   - Describe the main page layout
+   - Describe each sub-page and how users navigate to it
    - Describe the placeholder data
-4. **Present plan** — explain what you'll build and ask for confirmation
-5. **Wait for approval** — NEVER start coding without confirmation
-6. **Build:**
+5. **Present plan** — explain what you'll build and ask for confirmation
+6. **Wait for approval** — NEVER start coding without confirmation
+7. **Build:**
    a. Create directory: `web/src/app/(dashboard)/wireframes/<feature-slug>/<wireframe-slug>/`
-   b. Create `page.tsx` — the main wireframe page wrapped in BaseLayout
+   b. Create `page.tsx` — depends on sub-page relationship:
+      - **Interconnecting sub-pages:** `page.tsx` is the primary view (e.g., listing page). Navigation to sub-pages flows naturally (table row clicks, buttons, breadcrumbs).
+      - **Non-interconnecting sub-pages:** `page.tsx` is an index page listing all sub-pages with links, so reviewers can discover and navigate to each one.
+      - **No sub-pages:** `page.tsx` is the entire wireframe.
    c. Create components in `components/` subdirectory if needed
-   d. Create `metadata.json`
-   e. If feature index doesn't exist, create `workflows/<feature-slug>/page.tsx`
-7. **Present result** — show the file structure and key code
+   d. Create sub-pages as nested routes (e.g., `create/page.tsx`, `[id]/page.tsx`)
+   e. Create `metadata.json`
+   f. If feature index doesn't exist, create `wireframes/<feature-slug>/page.tsx`
+8. **Present result** — show the file structure and key code
+
+**IMPORTANT:** Do NOT create separate wireframes for sub-views. A "Create Campaign" form is a sub-page of the "Campaign Management" wireframe, not its own wireframe.
 
 ### Recording approval (wireframe_review phase):
 
 1. Ask: "Has Jeff approved this wireframe?"
 2. On "yes": Update `metadata.json` with status=approved, approved_by="jeff", approved_at=today
 3. Update `.workflow-state.json` wireframe approval
-4. Check if ALL wireframes for this feature are approved
-5. If all approved: "All wireframes approved! Run `/workflow next` to create the feature branch."
+4. If approved: "Wireframe approved! Run `/workflow next` to create the feature branch."
 
 ## WIREFRAME page.tsx PATTERN
 
