@@ -644,31 +644,20 @@ mkdir -p .claude
 ln -sf ../.agentic-workflows/agents/claude-code .claude/agents
 ```
 
-Configure project settings based on the session mode chosen in Step 1.4:
+Configure project settings — copy the base template, then modify based on session mode:
 
-**If user chose "Team Session" (`claude_session_mode: "team"`):**
 ```bash
-cat > .claude/settings.json << 'SETTINGS'
-{
-  "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
-  }
-}
-SETTINGS
+cp .agents/skills/onboard/references/claude-settings.json .claude/settings.json
 ```
-This enables Agent Teams for the `implementation` phase — parallel per-service engineers + architect. Warn user: "Team Session mode is experimental. It consumes more tokens and may hit context window limits faster."
+
+**If user chose "Team Session" (`claude_session_mode: "team"`) in Step 1.4:**
+- Read `.claude/settings.json`
+- Set `env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` to `"1"`
+- Write the updated file back
+- Warn user: "Team Session mode is experimental. It consumes more tokens and may hit context window limits faster."
 
 **If user chose "Agent Session" (`claude_session_mode: "agent"`) or skipped the question:**
-```bash
-cat > .claude/settings.json << 'SETTINGS'
-{
-  "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "env": {}
-}
-SETTINGS
-```
-Implementation uses the sequential single-agent flow (frndos-implement → frndos-pr).
+- No modification needed — the base template already has an empty `env`.
 
 **Switching modes later:** The user can switch between Agent Session and Team Session at any time by running `/workflow mode`. See the workflow skill for details.
 

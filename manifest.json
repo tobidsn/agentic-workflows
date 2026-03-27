@@ -117,6 +117,11 @@
       "install_to": ".agents/skills/onboard/references/launch-direct.json",
       "type": "reference"
     },
+    "skills/onboard/references/claude-settings.json": {
+      "sha256": "3dcd50de8b209bea618b7a00da485e8e3fc9d4bc502581de7e76cb3e1fa36362",
+      "install_to": ".agents/skills/onboard/references/claude-settings.json",
+      "type": "reference"
+    },
     "skills/workflow/SKILL.md": {
       "sha256": "848a73ec8c20ec5983b0e7f8a7e9ce975984b086e4fd1632a43c13797d42235f",
       "install_to": ".agents/skills/workflow/SKILL.md",
