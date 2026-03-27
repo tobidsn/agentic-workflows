@@ -51,15 +51,6 @@ curl -sL "https://raw.githubusercontent.com/alva-intelligence/agentic-workflows/
   -o /tmp/aw-update-check.sh && bash /tmp/aw-update-check.sh --bootstrap
 ```
 
-**To bootstrap from a specific branch** (e.g., `claude-teams` for Agent Teams features):
-
-```bash
-curl -sL "https://raw.githubusercontent.com/alva-intelligence/agentic-workflows/claude-teams/scripts/update-check.sh" \
-  -o /tmp/aw-update-check.sh && bash /tmp/aw-update-check.sh --bootstrap --branch=claude-teams
-```
-
-The `--branch` flag is persisted — subsequent update checks automatically track the same branch. You can also set `AW_BRANCH=claude-teams` as an env var.
-
 This downloads agents, skills, fragments, templates, and workflow configs into `.agentic-workflows/`, `.agents/`, and generates `AGENTS.md`. The workspace directory stays a plain folder — NOT a git repo.
 
 ### Step 4: After bootstrap — start onboarding
@@ -122,14 +113,12 @@ When `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is set (configured via `.claude/se
 
 ### How auto-update works
 
-1. Edit files in this repo → push to `main` (or a feature branch)
+1. Edit files in this repo → push to `main`
 2. GitHub Action computes SHA-256 hashes, bumps VERSION, updates `manifest.json`
 3. On next agent session, `update-check.sh` compares local hashes vs manifest
 4. Only changed files are downloaded — fragments, agents, skills, etc.
 5. If fragments changed, `AGENTS.md` is regenerated automatically
 6. For non-trivial changes (settings, schema migrations), use `/workflow-update`
-
-**Branch tracking:** Workspaces bootstrapped with `--branch=<branch>` persist the branch in `.agentic-workflows/.branch` and automatically pull updates from that branch on subsequent checks.
 
 ### Repository structure
 
@@ -152,7 +141,7 @@ agentic-workflows/
       opencode/           # Agent definitions (.md) for OpenCode
     AGENTS.md.template    # Template with {{FRAGMENT:...}} markers
   scripts/
-    update-check.sh       # Downloads updates (supports --branch=<branch>)
+    update-check.sh       # Downloads updates from this repo
     generate-agents.sh    # Assembles AGENTS.md from fragments
   skills/
     onboard/              # /onboard — full workspace setup
