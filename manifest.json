@@ -1,5 +1,5 @@
 {
-  "version": "2.0.45",
+  "version": "2.0.46",
   "updated": "2026-03-27",
   "files": {
     "agents/fragments/session-protocol.md": {
@@ -23,7 +23,7 @@
       "type": "fragment"
     },
     "agents/fragments/wireframe-conventions.md": {
-      "sha256": "4f8877a98c30c4a514a92697f5b4871fda7785aa7068240010160b6a8e61dbfd",
+      "sha256": "a919578412643a0e655aa74bbce5aa770349dbcf3f414e2ea0165ace494c2c6f",
       "install_to": ".agentic-workflows/fragments/wireframe-conventions.md",
       "type": "fragment"
     },
@@ -158,7 +158,7 @@
       "type": "agent"
     },
     "agents/tools/claude-code/frndos-wireframe.md": {
-      "sha256": "723de4ea5abfeb6c7f09a35ae20a2c7c7f3cea8a93c87018bc774cbcf465cb3b",
+      "sha256": "5f6083edabb97aca92ed566375a1451a083374178ca6513f9ba883faf82ea296",
       "install_to": ".agentic-workflows/agents/claude-code/frndos-wireframe.md",
       "type": "agent"
     },
