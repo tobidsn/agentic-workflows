@@ -4,18 +4,40 @@
 
 Wireframes live at: `web/src/app/(dashboard)/wireframes/<feature-slug>/<wireframe-slug>/`
 
+### What is a Wireframe?
+
+A wireframe = **one feature page**. It represents the main entry point for a feature (e.g., a dashboard, a listing page, a settings panel). Sub-views like create forms, detail pages, wizard steps, and modals are **sub-pages within the same wireframe**, not separate wireframes.
+
+**Example:** A "Campaign Management" feature has ONE wireframe (`campaign-management`) containing:
+- Main page: campaign listing with filters and table
+- Sub-page `create/`: multi-step campaign creation wizard
+- Sub-page `[id]/`: campaign detail view with tabs
+- Sub-page `[id]/edit/`: campaign edit form
+
+These are all part of the same wireframe, not 4 separate wireframes.
+
 ### Directory Structure
 
 ```
-workflows/<feature-slug>/
-├── page.tsx                    # Feature index: lists all wireframes
+wireframes/<feature-slug>/
+├── page.tsx                        # Feature index: lists wireframes (usually just one)
 └── <wireframe-slug>/
-    ├── page.tsx                # The actual wireframe page
-    ├── components/             # Wireframe-specific components
+    ├── page.tsx                    # Main wireframe page (the feature's primary view)
+    ├── components/                 # Shared components across all sub-pages
     │   ├── MetricCard.tsx
     │   └── DataTable.tsx
-    └── metadata.json           # Wireframe metadata
+    ├── metadata.json               # Wireframe metadata
+    ├── create/                     # Sub-page: create form / wizard
+    │   └── page.tsx
+    ├── [id]/                       # Sub-page: detail view (dynamic route)
+    │   ├── page.tsx
+    │   └── edit/                   # Sub-page: edit form
+    │       └── page.tsx
+    └── settings/                   # Sub-page: feature settings
+        └── page.tsx
 ```
+
+Not every wireframe needs sub-pages — simple features may only have a single `page.tsx`. Add sub-pages only when the PRD describes navigable views (create, detail, edit, wizard steps, etc.).
 
 ### metadata.json
 
@@ -74,8 +96,25 @@ workflows/<feature-slug>/
 - Gated by `NODE_ENV !== 'production'` in the layout
 - The `/workflows` route is NOT included in production builds
 
+### Sub-Pages
+
+- Sub-pages are nested routes inside a wireframe directory (e.g., `create/page.tsx`, `[id]/page.tsx`)
+- Sub-pages share the wireframe's `components/` directory
+- Sub-pages follow the same rules as the main page: `BaseLayout`, frndos components only, no business logic
+- Use Next.js dynamic routes for detail pages: `[id]/page.tsx`
+- Use the `Stepper` component for wizard/multi-step flows within a sub-page
+
+**Main `page.tsx` behavior depends on whether sub-pages interconnect:**
+
+| Sub-pages | Main `page.tsx` role | Example |
+|-----------|---------------------|---------|
+| **Interconnecting** (listing → detail → edit) | The primary view itself (e.g., listing page). Navigation flows naturally via buttons, table row clicks, breadcrumbs. | Campaign listing → click row → detail → click edit → edit form |
+| **Non-interconnecting** (independent views) | An **index page** that lists all sub-pages with links. Users pick which sub-page to view. | Feature with separate "Reports", "Settings", "Import" pages that don't link to each other |
+
+When clicking a wireframe in the wireframe library, the main `page.tsx` is always what loads first. For non-interconnecting sub-pages, this index page is how reviewers discover and navigate to each sub-page.
+
 ### Ownership
 
 - Each wireframe has an `owner` in metadata.json
 - Only the owner (or unassigned wireframes) can be edited by an agent
-- Multiple people can own different wireframes for the same PRD
+- Multiple people can own different wireframes for the same PRD (rare — most PRDs have one wireframe)
