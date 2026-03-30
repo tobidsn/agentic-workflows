@@ -194,6 +194,45 @@ You described a dashboard. The agent wrote the PRD, built a polished static fron
 split the work into service PRDs, implemented across services, handled code review,
 and shipped merged PRs. You approved plans and steered — the agents did the rest.
 
+### Skills
+
+Skills are slash commands you invoke directly. They're the entry points for each workflow action.
+
+| Skill | What it does |
+|-------|-------------|
+| `/onboard` | Full workspace setup — GitHub access, service cloning, dependencies, .env files, database, editor config, MCP servers. Run once after bootstrap. |
+| `/workflow start <slug>` | Start a new feature. Creates workflow state, enters PRD phase, delegates to the right agent. |
+| `/workflow status` | Show current feature phase, branch, PRDs, wireframes, PRs — everything at a glance. |
+| `/workflow next` | Advance to the next phase (checks gate conditions first). |
+| `/workflow switch <slug>` | Context-switch between active features. Each keeps its own phase. |
+| `/workflow resume <slug>` | Pick up someone else's feature. Reconstructs phase from committed artifacts. |
+| `/workflow list` | List all local features with their phases. |
+| `/workflow list-all` | Discover ALL features across the team — scans branches, PRDs, track files. |
+| `/workflow mode` | Switch Claude Code between Agent Session (sequential) and Team Session (parallel). |
+| `/workflow progress` | Detailed progress: phase timeline, task completion %, session logs. |
+| `/workflow-update` | Update agentic-workflows instructions. Runs update script, summarizes changes, applies non-trivial updates (settings, schema migrations). |
+| `/workflow-update check` | Dry-run — check for available updates without applying. |
+| `/workflow-update verify` | Health check — verify symlinks, settings, AGENTS.md, version are correct. |
+| `/prd` | Create a formal PRD from a Lark doc URL or your description. |
+| `/prd-split` | Split a main PRD into per-service PRDs (API, Web, AI, Data). |
+| `/wireframe` | Build production-quality static frontend pages for a feature. |
+
+### Agents
+
+Agents are phase-scoped specialists. You never invoke them directly — the orchestra delegates based on workflow phase. Each agent has a specific model assignment optimized for its task.
+
+| Agent | Model | Phase | What it does |
+|-------|-------|-------|-------------|
+| `frndos-orchestra` | Opus 4.5 | All | **The router.** Reads workflow state, delegates to the right agent, never does work itself. Handles branch creation and context switching. In Team Session mode, acts as the lead — creates the team, approves plans, coordinates reviews. |
+| `frndos-prd` | Opus 4.6 | PRD Creation | Reads Lark docs (via MCP) or user input. Asks clarifying questions, challenges assumptions. Outputs a structured PRD with objectives, user stories, acceptance criteria, and technical scope. |
+| `frndos-wireframe` | Opus 4.6 | Wireframe | Builds production-quality static frontend — not sketches. Uses frndos components, creates sub-pages for navigable views, includes all interactive states. Output is the actual UI that engineers wire up later. |
+| `frndos-splitter` | Opus 4.6 | PRD Splitting | Reads the main PRD and generates per-service PRDs. Each service PRD has specific endpoints, migrations, models, components, or data pipelines scoped to that service. |
+| `frndos-implement` | Opus 4.6 | Implementation | **Sequential mode only.** Implements across all services following service PRDs. Reads track files, presents plan, waits for approval, implements task-by-task, runs tests, commits per task. |
+| `frndos-engineer` | Opus 4.6 | Implementation | **Team Session only.** One per service. Implements, self-reviews, creates PR for their assigned service. Communicates via mailbox. Cannot write code outside their service directory. |
+| `frndos-architect` | Opus 4.6 | Implementation | **Team Session only.** Reviews cross-service integration — API contracts, shared types, data flow, auth consistency. Does NOT review code quality (engineer's self-review handles that). Does NOT write code. |
+| `frndos-pr` | Sonnet 4.6 | PR phases | Creates PRs from templates, tags reviewers, handles feedback. Works for both wireframe PRs (targeting develop, FE owner review) and feature PRs (per-service, targeting develop/development). |
+| `frndos-track` | Sonnet 4.6 | Completion | Updates track files with task completion, session logs, PR URLs. Marks features complete in workflow state. |
+
 ### Workflow State Machine
 
 11 phases with gate enforcement — each phase has a dedicated agent and model assignment.
