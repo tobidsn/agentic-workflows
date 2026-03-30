@@ -194,6 +194,38 @@ You described a dashboard. The agent wrote the PRD, built a polished static fron
 split the work into service PRDs, implemented across services, handled code review,
 and shipped merged PRs. You approved plans and steered — the agents did the rest.
 
+### Workflow State Machine
+
+11 phases with gate enforcement — each phase has a dedicated agent and model assignment.
+
+![Workflow State Machine](./docs/workflow-state-machine.svg)
+
+### Agent Architecture
+
+Phase-scoped agents with auto-delegation — orchestra routes, sub-agents do the work.
+
+![Agent Architecture](./docs/agent-architecture.svg)
+
+### Agent Teams (Parallel Implementation)
+
+When `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is set (configured via `.claude/settings.json` during onboarding), the `implementation` phase uses Claude Code's Agent Teams API instead of a single sequential agent:
+
+| Role | Agent | Count | Description |
+|------|-------|-------|-------------|
+| **Lead** | frndos-orchestra | 1 | Creates the team, approves plans, coordinates reviews, tracks PRs |
+| **Architect** | frndos-architect | 1 | Cross-service integration reviewer (does NOT write code) |
+| **Engineer** | frndos-engineer | 1 per service | Implements, self-reviews, and creates PR for their assigned service |
+
+**How it works:**
+- Lead creates the team via natural language (not `Agent()` tool calls)
+- Each teammate is a persistent session with its own context
+- Communication happens via **mailbox** (`message` for 1:1, `broadcast` for all)
+- Engineers are spawned with **plan approval required** — they're in read-only mode until the lead approves
+- Shared task list tracks per-service chains: `plan → implement → self-review → architect-review → pr`
+- When all PRs are merged, lead shuts down teammates and cleans up the team
+
+**Sequential fallback:** Cursor, OpenCode, or when the env var is unset — uses `frndos-implement` → `frndos-pr` (unchanged).
+
 ### Skills
 
 Skills are slash commands you invoke directly. They're the entry points for each workflow action.
@@ -232,38 +264,6 @@ Agents are phase-scoped specialists. You never invoke them directly — the orch
 | `frndos-architect` | Opus 4.6 | Implementation | **Team Session only.** Reviews cross-service integration — API contracts, shared types, data flow, auth consistency. Does NOT review code quality (engineer's self-review handles that). Does NOT write code. |
 | `frndos-pr` | Sonnet 4.6 | PR phases | Creates PRs from templates, tags reviewers, handles feedback. Works for both wireframe PRs (targeting develop, FE owner review) and feature PRs (per-service, targeting develop/development). |
 | `frndos-track` | Sonnet 4.6 | Completion | Updates track files with task completion, session logs, PR URLs. Marks features complete in workflow state. |
-
-### Workflow State Machine
-
-11 phases with gate enforcement — each phase has a dedicated agent and model assignment.
-
-![Workflow State Machine](./docs/workflow-state-machine.svg)
-
-### Agent Architecture
-
-Phase-scoped agents with auto-delegation — orchestra routes, sub-agents do the work.
-
-![Agent Architecture](./docs/agent-architecture.svg)
-
-### Agent Teams (Parallel Implementation)
-
-When `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is set (configured via `.claude/settings.json` during onboarding), the `implementation` phase uses Claude Code's Agent Teams API instead of a single sequential agent:
-
-| Role | Agent | Count | Description |
-|------|-------|-------|-------------|
-| **Lead** | frndos-orchestra | 1 | Creates the team, approves plans, coordinates reviews, tracks PRs |
-| **Architect** | frndos-architect | 1 | Cross-service integration reviewer (does NOT write code) |
-| **Engineer** | frndos-engineer | 1 per service | Implements, self-reviews, and creates PR for their assigned service |
-
-**How it works:**
-- Lead creates the team via natural language (not `Agent()` tool calls)
-- Each teammate is a persistent session with its own context
-- Communication happens via **mailbox** (`message` for 1:1, `broadcast` for all)
-- Engineers are spawned with **plan approval required** — they're in read-only mode until the lead approves
-- Shared task list tracks per-service chains: `plan → implement → self-review → architect-review → pr`
-- When all PRs are merged, lead shuts down teammates and cleans up the team
-
-**Sequential fallback:** Cursor, OpenCode, or when the env var is unset — uses `frndos-implement` → `frndos-pr` (unchanged).
 
 ### How auto-update works
 
