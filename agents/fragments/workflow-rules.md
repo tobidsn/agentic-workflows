@@ -151,6 +151,43 @@ NEVER make assumptions about requirements without asking.
 NEVER skip the confirmation step, even for "obvious" actions.
 NEVER auto-proceed after presenting a plan — always wait for explicit approval.
 
+### JJ Workspace Rules (Parallel Features)
+
+When JJ (Jujutsu) is available and the user wants to work on multiple features simultaneously, they can use `/jj-workflow` to create isolated working directories.
+
+**Colocated mode — git unchanged:**
+- JJ runs in colocated mode alongside git. All git commands (commit, push, branch, merge) work exactly as before.
+- JJ is used ONLY for workspace management: `jj workspace add`, `jj workspace list`, `jj workspace forget`.
+- JJ does NOT replace git for commits, branches, or diffs.
+
+**Claude Code only:**
+- JJ workspaces create separate working directories — useful for Claude Code sessions running in parallel terminals.
+- Cursor and OpenCode sessions don't benefit (they work within a single directory).
+
+**Independence:**
+- Each workspace operates independently. A feature in workspace B does not wait for workspace A.
+- Each workspace has its own `.workflow-state.json` with its own feature state machine.
+- The workflow phase machine is unchanged — all 11 phases work identically in any workspace.
+
+**Commit propagation:**
+- Since JJ workspaces share the same underlying repo graph, committed changes in one workspace are immediately visible in the other via `git log` or `git pull`.
+- Uncommitted changes are isolated per workspace.
+
+**Port conflicts:**
+- The same services (e.g., API on :9191, Frontend on :3000) CANNOT run in two workspaces simultaneously.
+- Stop services in one workspace before starting them in the other, or configure different ports.
+
+**Workspace hierarchy:**
+- Only the **primary workspace** can create new workspaces (`/jj-workflow new <slug>`).
+- Secondary workspaces CANNOT create nested workspaces.
+- Cleanup (`/jj-workflow cleanup <slug>`) must be run from the primary workspace.
+
+**Lifecycle:**
+- Create: `/jj-workflow new <slug>` from primary workspace
+- Work: open a new Claude Code session in the new directory, run `/workflow start <slug>`
+- Complete: finish the feature normally, merge PRs
+- Clean up: `/jj-workflow cleanup <slug>` from primary workspace
+
 ### Steps requiring sudo or external terminal
 
 Some steps (Nix installation, system config changes, etc.) require `sudo` or an interactive terminal that the agent cannot provide. For these:

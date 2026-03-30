@@ -2,7 +2,13 @@
 
 **This protocol MUST be executed before ANY other work. No exceptions.**
 
-### Step 0: Detect workspace state
+### Step 0: Detect workspace type
+
+Check `.workflow-state.json` for `workspace_meta.is_jj_workspace`:
+- If `true` → this is a **secondary JJ workspace**, scoped to one feature. Note this for later — the session is limited to the feature in `workspace_meta.feature_slug`.
+- If `false` or absent → this is the **primary workspace** (or a non-JJ workspace). Check `command -v jj` to detect JJ availability for later use (e.g., suggesting `/jj-workflow new` when starting parallel features).
+
+### Step 0.5: Detect workspace state
 
 Check the workspace to determine what's needed:
 

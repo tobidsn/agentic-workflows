@@ -25,6 +25,20 @@
           "$ref": "#/definitions/feature"
         }
       }
+    },
+    "workspaces": {
+      "description": "Registry of JJ workspaces (primary workspace only). Maps workspace slug to its metadata.",
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-z0-9]+(-[a-z0-9]+)*$": {
+          "$ref": "#/definitions/workspace_entry"
+        }
+      }
+    },
+    "workspace_meta": {
+      "description": "Pointer back to primary workspace (secondary JJ workspaces only).",
+      "$ref": "#/definitions/workspace_meta"
     }
   },
   "definitions": {
@@ -200,6 +214,52 @@
           "description": "Number of tasks completed by this engineer.",
           "type": "integer",
           "minimum": 0
+        }
+      }
+    },
+    "workspace_entry": {
+      "type": "object",
+      "description": "Registry entry for a JJ workspace (stored in primary workspace only).",
+      "required": ["path", "created", "worker"],
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "description": "Relative path to the workspace directory (e.g., '../frndos-feature-b').",
+          "type": "string",
+          "minLength": 1
+        },
+        "created": {
+          "description": "ISO 8601 timestamp of when the workspace was created.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "worker": {
+          "description": "Identifier of the worker who created this workspace.",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "workspace_meta": {
+      "type": "object",
+      "description": "Metadata for a secondary JJ workspace — points back to the primary workspace.",
+      "required": ["primary_workspace", "feature_slug", "is_jj_workspace"],
+      "additionalProperties": false,
+      "properties": {
+        "primary_workspace": {
+          "description": "Relative path to the primary workspace (e.g., '../frndos').",
+          "type": "string",
+          "minLength": 1
+        },
+        "feature_slug": {
+          "description": "The feature slug this workspace was created for.",
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        },
+        "is_jj_workspace": {
+          "description": "Always true for JJ workspaces. Used for quick detection.",
+          "type": "boolean",
+          "const": true
         }
       }
     }

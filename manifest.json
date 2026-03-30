@@ -3,12 +3,12 @@
   "updated": "2026-03-30",
   "files": {
     "agents/fragments/session-protocol.md": {
-      "sha256": "ffd0e003df5f3c231a65df05e3e05a382e7ef94b9ac96dfcf8ee0f953189c7f7",
+      "sha256": "fb64eba0d6b59c8f728d6d33208e72c3485375df3ffa4f5d5800c917d76e467c",
       "install_to": ".agentic-workflows/fragments/session-protocol.md",
       "type": "fragment"
     },
     "agents/fragments/workflow-rules.md": {
-      "sha256": "f672684360fd64b1a295454d2d03ede7945bba37687516bbd98cdbb703d62b13",
+      "sha256": "f1e650b2687715437972d490ae12fe2f66f4bea080b7ab8fa591ea1125542ed5",
       "install_to": ".agentic-workflows/fragments/workflow-rules.md",
       "type": "fragment"
     },
@@ -63,7 +63,7 @@
       "type": "workflow"
     },
     "workflow/state-schema.json": {
-      "sha256": "977ba7d6d26f87705d2f651efba8b52e0897797d63f55a43d4c4fd4a2ac1056a",
+      "sha256": "c0d6f2fb0e8d30379afd85b135dda8faccf84cb9133cfc3c2b10e4fadd247bf4",
       "install_to": ".agentic-workflows/workflow/state-schema.json",
       "type": "workflow"
     },
@@ -92,8 +92,13 @@
       "install_to": ".agentic-workflows/templates/pr/feature-pr.template.md",
       "type": "template"
     },
+    "skills/jj-workflow/SKILL.md": {
+      "sha256": "5f896c5c8b41d6f0b78979687635dce26fd3b255f9975a54ca4ad7b13fd8740a",
+      "install_to": ".agents/skills/jj-workflow/SKILL.md",
+      "type": "skill"
+    },
     "skills/onboard/SKILL.md": {
-      "sha256": "b77b29cd5b7a9d5964b272786b1a2a6893df9ea065f98c67598670feadb5c1d9",
+      "sha256": "ccd146a563946f7521c625575f042136e809f273d798703d8c977634dbe84747",
       "install_to": ".agents/skills/onboard/SKILL.md",
       "type": "skill"
     },
@@ -123,7 +128,7 @@
       "type": "reference"
     },
     "skills/workflow/SKILL.md": {
-      "sha256": "848a73ec8c20ec5983b0e7f8a7e9ce975984b086e4fd1632a43c13797d42235f",
+      "sha256": "ff078ce1a4a0107b4054a7d435b7b9c9181e0a9a12cac65181af861f9d188ffb",
       "install_to": ".agents/skills/workflow/SKILL.md",
       "type": "skill"
     },
@@ -148,7 +153,7 @@
       "type": "skill"
     },
     "agents/tools/claude-code/frndos-orchestra.md": {
-      "sha256": "abebfda97309330335ac1fe74d89a02e44103360b88ff1a9de15f39ad9e76797",
+      "sha256": "def524ce1f0d35586054026b5c4f22540e8d917502f4c47efbf3c0781d548ac9",
       "install_to": ".agentic-workflows/agents/claude-code/frndos-orchestra.md",
       "type": "agent"
     },
@@ -273,7 +278,7 @@
       "type": "scaffold"
     },
     "flake.nix": {
-      "sha256": "149fa75c1128c2af9fbaebd729c38d4e0b8ac45e50943402add2b93d75891bd5",
+      "sha256": "d187c2e902950f9603ec49b6be8eaaaebdc2d8049237099336c28e8c20e79978",
       "install_to": "flake.nix",
       "type": "config"
     }

@@ -38,6 +38,9 @@
             # Email testing
             mailhog
 
+            # VCS
+            jujutsu
+
             # Tools
             curl
             gh
@@ -64,6 +67,7 @@
             echo "  Redis:      $(redis-server --version 2>/dev/null || echo 'not found')"
             echo "  gh:         $(gh --version 2>/dev/null | head -1 || echo 'not found')"
             echo "  git:        $(git --version 2>/dev/null || echo 'not found')"
+            echo "  jj:         $(jj --version 2>/dev/null || echo 'not found')"
             echo ""
 
             echo "Service health checks:"

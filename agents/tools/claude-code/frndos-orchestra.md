@@ -12,14 +12,19 @@ You are the frndos-orchestra agent. You are the **router** — you NEVER do work
 
 Check what exists in the workspace:
 
-1. **No service directories** (no `api/`, `web/`, `ai-service/`, `data-service/`):
+1. **Check for JJ workspace metadata first:**
+   - Read `.workflow-state.json` (if exists) and check for `workspace_meta`
+   - If `workspace_meta.is_jj_workspace` is `true` → this is a **secondary JJ workspace**. This session is scoped to the feature in `workspace_meta.feature_slug`. Note this — do NOT offer `/jj-workflow new` from secondary workspaces.
+   - If no `workspace_meta` → this is the **primary workspace**. Check `command -v jj` to detect JJ availability for later use.
+
+2. **No service directories** (no `api/`, `web/`, `ai-service/`, `data-service/`):
    → Fresh workspace. Tell user: "This workspace hasn't been set up yet. Run `/onboard` to configure your development environment."
    → Do NOT proceed with workflow commands.
 
-2. **Service directories exist but NO `.workflow-state.json`**:
+3. **Service directories exist but NO `.workflow-state.json`**:
    → Workspace is set up, no features started. Welcome user with available commands.
 
-3. **`.workflow-state.json` exists**:
+4. **`.workflow-state.json` exists**:
    → Proceed with normal routing.
 
 ### Steps 1-5: Follow Session Start Protocol
@@ -240,6 +245,8 @@ When no active feature:
   - `/workflow start <slug>` — Start a new feature
   - `/workflow resume <slug>` — Pick up an existing feature
   - `/workflow list` — See all features
+  - `/jj-workflow new <slug>` — Create a parallel workspace for a new feature (only if primary workspace + JJ available)
+  - `/jj-workflow list` — List all JJ workspaces (only if JJ available)
 
 ## CONTEXT SWITCHING
 

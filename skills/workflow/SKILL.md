@@ -54,12 +54,19 @@ Start a new feature workflow.
    - If `status` is `"completed"` → proceed
 2. Read `.workflow-state.json` (create if doesn't exist)
 3. Check that `<slug>` doesn't already exist in features
-4. Create feature entry with phase: "prd_creation"
-5. Set `active_feature` to `<slug>`
-6. Set `phase_entered` to current timestamp
-7. Ask user for worker name if not set
-8. Save state
-9. Inform user: "Feature `<slug>` started. Phase: prd_creation. Delegating to frndos-prd."
+4. **If an active feature already exists AND JJ is available** (`command -v jj`):
+   - Suggest parallel workspace as an option:
+     > "You have an active feature (`<active-slug>` in `<phase>`). You can:"
+     > - **Continue here** with context-switching (`/workflow switch` between features)
+     > - **Create a parallel workspace** with `/jj-workflow new <slug>` to work on `<slug>` in a separate directory
+   - If user chooses parallel workspace → tell them to run `/jj-workflow new <slug>` and stop
+   - If user chooses to continue here → proceed with step 5
+5. Create feature entry with phase: "prd_creation"
+6. Set `active_feature` to `<slug>`
+7. Set `phase_entered` to current timestamp
+8. Ask user for worker name if not set
+9. Save state
+10. Inform user: "Feature `<slug>` started. Phase: prd_creation. Delegating to frndos-prd."
 
 ### `/workflow next`
 Transition to the next phase (if gate conditions are met).
@@ -87,7 +94,7 @@ Switch active feature context.
 7. Save state
 
 ### `/workflow list-all`
-Discover ALL features across the team — not just local ones. Scans committed artifacts and git branches.
+Discover ALL features across the team — not just local ones. Scans committed artifacts, git branches, and JJ workspaces.
 
 **Steps:**
 1. Fetch latest from all remotes: `git fetch --all` in each service dir
@@ -96,6 +103,7 @@ Discover ALL features across the team — not just local ones. Scans committed a
    - **Feature branches:** `git branch -r | grep 'feature/.*/vc-'` in each service → extract slugs
    - **Track files:** `find . -name '*.track.md'` across all services → extract slugs
    - **Wireframes:** `ls web/src/app/(dashboard)/wireframes/` → extract slugs
+   - **JJ workspaces:** if `workspaces` map exists in `.workflow-state.json`, read each workspace's `.workflow-state.json` to discover features tracked in secondary workspaces
 3. For each unique slug found, reconstruct the phase (same logic as resume):
    - PRD exists? Wireframe approved? Branch exists? Service PRDs? Track progress? PR?
 4. Also check local `.workflow-state.json` for any features only tracked locally

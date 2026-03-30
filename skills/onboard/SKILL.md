@@ -49,6 +49,7 @@ Throughout onboarding, maintain a `.onboard-state.json` file at the workspace ro
   "services": ["api", "web", "ai-service", "data-service"],
   "tools": ["claude-code", "cursor"],
   "claude_session_mode": "agent|team",
+  "jj_available": true,
   "steps": {
     "github_access": "completed|skipped|pending",
     "questionnaire": "completed|pending",
@@ -385,7 +386,46 @@ All tools must be available. If any are missing, troubleshoot before continuing.
 
 ### After either option — record and continue
 
-Save the environment method in `.onboard-state.json` and proceed to Step 3. All subsequent steps (clone, deps, .env, DB) work the same regardless of Nix or direct install.
+Save the environment method in `.onboard-state.json` and proceed to Step 2.5. All subsequent steps (clone, deps, .env, DB) work the same regardless of Nix or direct install.
+
+## Step 2.5: JJ (Jujutsu) Setup — Claude Code Only
+
+**Skip this step entirely if the user did NOT select Claude Code in Step 1.3.**
+
+JJ enables parallel feature development via isolated workspaces. It runs in colocated mode alongside git — all git commands remain unchanged.
+
+1. **Check if JJ is available:**
+   ```bash
+   command -v jj &>/dev/null && echo "✓ jj available: $(jj --version)" || echo "✗ jj not found"
+   ```
+
+2. **If JJ is found** (e.g., from Nix flake or pre-installed):
+   - Record `jj_available: true` in `.onboard-state.json`
+   - Tell user: "JJ detected. After onboarding, you can use `/jj-workflow init` to enable colocated mode in service repos, then `/jj-workflow new <slug>` to create parallel workspaces for simultaneous feature development."
+   - **Do NOT run `jj git init --colocate` yet** — repos haven't been cloned. The user will run `/jj-workflow init` after clone.
+
+3. **If JJ is NOT found:**
+   - Use the ask tool:
+     > "JJ (Jujutsu) enables parallel feature development — work on multiple features in separate directories simultaneously. It's optional and only useful with Claude Code."
+     > - **Install JJ** (`brew install jj`) — recommended if you plan to work on multiple features in parallel
+     > - **Skip** — I'll work on one feature at a time
+   - If user chooses install:
+     ```bash
+     brew install jj
+     ```
+     Verify: `command -v jj && echo "✓ jj installed"`. Record `jj_available: true`.
+   - If user chooses skip: record `jj_available: false`. They can install later.
+
+4. **After clone (Step 4)**, if `jj_available` is `true`:
+   - Automatically run the equivalent of `/jj-workflow init`:
+     ```bash
+     for service in api web ai-service data-service; do
+       if [ -d "$service/.git" ] && [ ! -d "$service/.jj" ]; then
+         cd "$service" && jj git init --colocate && cd ..
+       fi
+     done
+     ```
+   - Report which repos were initialized
 
 ## Step 3: Verify Model Access
 
