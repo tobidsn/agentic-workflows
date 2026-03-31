@@ -23,9 +23,10 @@ workflow — from PRD creation to wireframing, implementation, and PR submission
 
 What gets installed:
   - 10 phase-scoped AI agents (orchestra, prd, wireframe, splitter, implement, engineer, architect, pr, track)
-  - 6 skills (/onboard, /workflow, /workflow-update, /prd, /prd-split, /wireframe)
+  - 8 skills (/onboard, /workflow, /workflow-update, /prd, /prd-split, /wireframe, /jj-workflow, /setup-workspace)
   - An 11-phase workflow state machine with gate enforcement
   - Agent Teams support — parallel per-service engineers + architect (Claude Code)
+  - JJ workspace support — parallel features in isolated directories (Claude Code)
   - Auto-updating instruction system (stays in sync with team changes)
   - Templates for PRDs, service PRDs, track files, and PRs
 
@@ -226,6 +227,45 @@ When `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` is set (configured via `.claude/se
 
 **Sequential fallback:** Cursor, OpenCode, or when the env var is unset — uses `frndos-implement` → `frndos-pr` (unchanged).
 
+### JJ Workspaces (Parallel Features)
+
+Work on multiple features simultaneously in isolated directories using [JJ (Jujutsu)](https://martinvonz.github.io/jj/) colocated workspaces. Each workspace gets its own Claude Code session and feature state machine, while sharing the same git commit graph.
+
+```
+Terminal 1 (primary):                    Terminal 2 (workspace):
+  frndos/                                  frndos-feature-b/
+  └─ feature: image-editor                 └─ feature: feature-b
+     phase: implementation                    phase: prd_creation
+     Claude Code session A                    Claude Code session B
+```
+
+**How it works:**
+- JJ runs in colocated mode — all git commands stay unchanged
+- JJ is only used for workspace management (`workspace add`, `workspace list`, `workspace forget`)
+- Committed changes propagate instantly between workspaces (shared repo graph)
+- Each workspace is independent — no cross-workspace phase dependencies
+
+**Commands:**
+- `/jj-workflow init` — Initialize JJ in service repos (one-time)
+- `/jj-workflow new <slug>` — Create a sibling workspace directory
+- `/jj-workflow list` — List all workspaces and their features
+- `/jj-workflow cleanup <slug>` — Remove a completed workspace
+
+**Requirements:** JJ installed (`brew install jj` or via `nix develop`), Claude Code only.
+
+### Creating a New Workspace for a Different Project
+
+Use `/setup-workspace` to create a brand new agentic workspace for a completely different project using this framework as the base. The skill walks you through an interactive wizard:
+
+1. Project identity (name, description, structure)
+2. Services (repos, stack, ports, health checks)
+3. Workflow phases (keep/remove/add from the default 11)
+4. Agents (which phase agents, models, editor support)
+5. Skills and MCP servers
+6. Dev environment (flake.nix packages, branch conventions)
+
+Then generates all configuration files — agents, fragments, skills, schemas, templates, and manifest.
+
 ### Skills
 
 Skills are slash commands you invoke directly. They're the entry points for each workflow action.
@@ -248,6 +288,12 @@ Skills are slash commands you invoke directly. They're the entry points for each
 | `/prd` | Create a formal PRD from a Lark doc URL or your description. |
 | `/prd-split` | Split a main PRD into per-service PRDs (API, Web, AI, Data). |
 | `/wireframe` | Build production-quality static frontend pages for a feature. |
+| `/jj-workflow init` | Initialize JJ colocated mode in service repos. |
+| `/jj-workflow new <slug>` | Create a parallel workspace — isolated directory for a separate Claude Code session to work on another feature simultaneously. |
+| `/jj-workflow list` | List all JJ workspaces with their feature, phase, and worker. |
+| `/jj-workflow status` | Show current workspace type (primary/secondary) and JJ state. |
+| `/jj-workflow cleanup <slug>` | Remove a completed workspace — forget JJ workspaces, delete directory, update registry. |
+| `/setup-workspace` | Interactive wizard to create a brand new agentic workspace for a different project using this framework as the base. |
 
 ### Agents
 
@@ -304,6 +350,8 @@ agentic-workflows/
     prd/                  # /prd — PRD creation
     prd-split/            # /prd-split — split PRD into service PRDs
     wireframe/            # /wireframe — wireframe builder
+    jj-workflow/          # /jj-workflow — JJ workspace management for parallel features
+    setup-workspace/      # /setup-workspace — wizard to create new agentic workspaces
   templates/
     prd/                  # PRD document templates
     pr/                   # PR body templates
