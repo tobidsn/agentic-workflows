@@ -34,7 +34,20 @@ Show ALL active features with their phases.
    - Mark active feature with `→`
 
 ### `/workflow start <slug>`
-Start a new feature workflow.
+Start a new workflow. **Auto-routes by Task Type** between two tracks:
+
+- **Feature** / **User Story** → full track (PRD → wireframe → split → impl → PR)
+- **Bug** / **Improvement** / **Task** / **Golang Refactor** → small track
+  (impl → PR only, no PRD/wireframe/split)
+
+**Flags:**
+- `--type=feature` — force full track (default if no Lark task is linked)
+- `--type=small` — force small track
+- `--task-type "<Lark task type>"` — pass the Lark Task Type label (e.g.
+  "Bug", "Improvement") and let the router decide. Used by
+  `/nexus-task start` to pipe Lark metadata in.
+- `--lark-task <guid>` — link the feature to a Lark task. Stored in
+  `.workflow-state.json.features.<slug>.lark_task_id`.
 
 **Steps:**
 1. **Check onboarding state first.** Read `.onboard-state.json`:
@@ -54,19 +67,92 @@ Start a new feature workflow.
    - If `status` is `"completed"` → proceed
 2. Read `.workflow-state.json` (create if doesn't exist)
 3. Check that `<slug>` doesn't already exist in features
-4. **If an active feature already exists AND JJ is available** (`command -v jj`):
+4. **Resolve track** (full vs small):
+   - If `--type` is passed: use it directly.
+   - Else if `--task-type` is passed: route by label —
+     `{Bug, Improvement, Task, Golang Refactor}` → `small`,
+     `{Feature, User Story}` → `full`, anything else → `full` (safe default).
+   - Else (no hints): default to `full`.
+5. **If an active feature already exists AND JJ is available** (`command -v jj`):
    - Suggest parallel workspace as an option:
      > "You have an active feature (`<active-slug>` in `<phase>`). You can:"
      > - **Continue here** with context-switching (`/workflow switch` between features)
      > - **Create a parallel workspace** with `/jj-workflow new <slug>` to work on `<slug>` in a separate directory
    - If user chooses parallel workspace → tell them to run `/jj-workflow new <slug>` and stop
-   - If user chooses to continue here → proceed with step 5
-5. Create feature entry with phase: "prd_creation"
-6. Set `active_feature` to `<slug>`
-7. Set `phase_entered` to current timestamp
-8. Ask user for worker name if not set
-9. Save state
-10. Inform user: "Feature `<slug>` started. Phase: prd_creation. Delegating to frndos-prd."
+   - If user chooses to continue here → proceed with step 6
+6. Create feature entry:
+   - **Full track:** `phase = "prd_creation"`, `track = "full"`.
+   - **Small track:** `phase = "small_implementation"`, `track = "small"`,
+     `branch = "fix/<worker>/vc-<slug>"` (or `task/<worker>/vc-<slug>` for
+     Task type, `golang/<worker>/vc-<slug>` for Golang Refactor).
+   - In both cases: store `lark_task_id` and `lark_task_type` if provided.
+7. Set `active_feature` to `<slug>`
+8. Set `phase_entered` to current timestamp
+9. Ask user for worker name if not set
+10. Save state
+11. Inform user:
+    - **Full track:** "Feature `<slug>` started. Track: full. Phase:
+      prd_creation. Delegating to frndos-prd."
+    - **Small track:** "Feature `<slug>` started. Track: small. Phase:
+      small_implementation. Branch: `<branch>`. Delegating to a sub-agent."
+
+## Small track
+
+A single-phase fast lane for Bug / Improvement / Task / Golang Refactor
+tickets. Skips PRD, wireframe, prd_splitting, and multi-service orchestration.
+
+### Phase: `small_implementation`
+
+Driven by a background sub-agent (Agent tool, `subagent_type:
+"general-purpose"`). The agent operates in the **current working directory**
+(no auto-cd into another repo). Caller is expected to be in the target
+service repo before invoking.
+
+**Sub-agent prompt** (constructed by `/workflow start ... --type=small`):
+- Full Lark task summary + description (if linked).
+- Slug, branch name, target repo path (cwd at invocation).
+- Instructions:
+  1. `git checkout -b <branch>` from current HEAD (assumed to be the default
+     branch — verify with `git rev-parse --abbrev-ref HEAD` and warn if not).
+  2. Read the Lark task content; identify the change scope from the
+     description.
+  3. Make code changes. Keep commits scoped — one logical unit per commit,
+     using the repo's commit-message style (`git log -10 --oneline`).
+  4. Push branch: `git push -u origin <branch>`.
+  5. Construct PR URL via `gh pr create --web --draft --fill` (don't submit,
+     just print the URL the command opens), or fall back to the GitHub
+     compare URL `https://github.com/<org>/<repo>/pull/new/<branch>` parsed
+     from `git remote get-url origin`.
+  6. For each commit on the new branch (`git log <default>..<branch>
+     --reverse --format="%s"`), call:
+     ```bash
+     lark-cli task subtasks create \
+       --params '{"task_guid":"<parent_lark_guid>"}' \
+       --data '{"summary":"<commit-subject>"}'
+     ```
+     so the Lark task gets one subtask per commit. Skip if no
+     `lark_task_id`.
+  7. Update `.workflow-state.json.features.<slug>`:
+     ```json
+     { "phase": "small_pr_review",
+       "branch": "<branch>",
+       "pr_url": "<url>",
+       "pr_urls": { "<service>": "<url>" },
+       "commit_subjects": [ "<subject1>", "<subject2>" ] }
+     ```
+  8. Report back: branch name, PR URL, list of created subtasks.
+
+### Phase: `small_pr_review`
+
+Terminal phase for the small track. Same semantics as `pr_review` on the
+full track for the purposes of `/nexus-task sync` — when this phase is
+reached, the linked Lark task is eligible for auto-close.
+
+### Gates
+
+The small track has no manual gate transitions — `small_implementation` →
+`small_pr_review` is automatic on agent completion. The only manual gate is
+human PR review/merge (outside the skill).
 
 ### `/workflow next`
 Transition to the next phase (if gate conditions are met).

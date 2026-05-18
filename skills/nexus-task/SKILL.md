@@ -138,12 +138,14 @@ all assignees + followers, due date, source URL.
 
 ### `/nexus-task start <#>`
 Spawn a sub-agent that runs `/workflow start` for the selected todo.
+Auto-routes between full and small track based on the Lark **Task Type**.
 
 **Steps:**
 
 1. Re-run the list query to get fresh task data. `<#>` is 1-indexed against
    the last printed table.
-2. Resolve `<#>` → `{task_guid, summary, description}`.
+2. Resolve `<#>` → `{task_guid, summary, description, task_type_id,
+   task_type_label}` (resolve label via `options.json.task_type.labels`).
    - If already linked in `.workflow-state.json`: ask "Already linked to
      `<slug>` (`<phase>`). Switch with `/workflow switch <slug>`?" and stop.
 3. Derive a feature slug from `summary`: lowercase, non-alphanumeric → `-`,
@@ -152,36 +154,51 @@ Spawn a sub-agent that runs `/workflow start` for the selected todo.
    unique.
 4. Re-use the full task detail already fetched in step 1 of this command (no
    second API call needed — same command run, no persistent task cache).
-5. Spawn a sub-agent via the Agent tool, `subagent_type: "general-purpose"`:
+5. **Route by Task Type:**
+   - `{Feature, User Story}` → **full track** (existing /workflow flow).
+   - `{Bug, Improvement, Task, Golang Refactor}` → **small track**
+     (single-pass implementation, see `/workflow` skill → "Small track").
+   - Unknown / unmapped Task Type → default to **full track**; print a
+     warning naming the unrecognised label so the user can adjust
+     `options.json` or override with `--type=small`.
+6. Spawn a sub-agent via the Agent tool, `subagent_type: "general-purpose"`,
+   `run_in_background: true`:
    - **description:** `"Start workflow for Lark todo: <slug>"`
    - **prompt:** include
      - full Lark todo summary + description
-     - instruction: "Run `/workflow start <slug>`. Draft the PRD from the
-       Lark todo content above. Follow `/workflow` gates; do not skip phases.
-       When the feature reaches `pr_review`, stop and report."
-     - the slug, Lark `task_guid`, and tasklist guid so the agent can write
-       them into the feature entry.
-6. After the Agent returns, reconcile `.workflow-state.json`:
+     - the slug, Lark `task_guid`, tasklist guid, and resolved
+       `task_type_label`
+     - instruction: ``"Run `/workflow start <slug> --type=<full|small>
+       --task-type \"<label>\" --lark-task <guid>`. Follow that skill's
+       phase machine; do not skip phases. When the feature reaches
+       `pr_review` (full) or `small_pr_review` (small), stop and report
+       back."``
+7. After the Agent dispatches (background — returns immediately), reconcile
+   `.workflow-state.json`:
    ```json
    "features": {
      "<slug>": {
        "lark_task_id": "<task_guid>",
-       "lark_tasklist_guid": "d9fb25b0-7023-4f42-8da3-06232b531f4d"
+       "lark_tasklist_guid": "d9fb25b0-7023-4f42-8da3-06232b531f4d",
+       "lark_task_type": "<label>",
+       "track": "<full|small>"
      }
    }
    ```
-7. Report: "Spawned agent for `<slug>` (Lark todo: <summary>). Track with
-   `/workflow status`."
+8. Report: "Spawned background agent for `<slug>` (Lark todo: <summary>,
+   Type: <label>, Track: <full|small>). Track with `/workflow status`. You
+   will be notified when the agent finishes."
 
 ### `/nexus-task sync`
 Reconcile workflow state with Lark. Close any Lark todos whose features have
-reached `pr_review` or `completion`.
+reached a "PR review" phase — `pr_review` (full track), `small_pr_review`
+(small track), or `completion`.
 
 **Steps:**
 
 1. Read `.workflow-state.json`. For each feature: skip if no `lark_task_id`,
-   skip if `phase` not in `{pr_review, completion}`, skip if `lark_completed_at`
-   already set.
+   skip if `phase` not in `{pr_review, small_pr_review, completion}`, skip
+   if `lark_completed_at` already set.
 2. For each remaining: `lark-cli task +complete --task-id <task_id>`.
 3. On success, write `lark_completed_at` (ISO 8601). On failure, surface the
    error verbatim and leave the timestamp empty for retry.
