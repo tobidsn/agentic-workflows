@@ -1,0 +1,83 @@
+{
+  "_comment": "Configuration for the nexus-task skill. Labels are maintained manually because the lark-cli app lacks task:custom_field:read scope.",
+  "tasklist_guid": "d9fb25b0-7023-4f42-8da3-06232b531f4d",
+  "tasklist_name": "Nexus 2026",
+
+  "default_filter": {
+    "project": ["Core"],
+    "status": ["To Do", "Reopened"],
+    "owner": "me",
+    "sort_by": "priority",
+    "_note": "owner='me' is resolved at runtime via `lark-cli auth status` → .userOpenId. Override with --owner <id|name> or bypass with --all."
+  },
+
+  "status": {
+    "field_name": "Status",
+    "field_guid": "c1ec140d-9366-473c-991b-bdab1e55eaa1",
+    "labels": {
+      "0a07a2a7-47b9-4490-a9ca-83e7508fd79b": "To Do",
+      "64454082-e953-4218-a3f7-11d9fbf72a25": "Backlog",
+      "264c0ac4-9069-40e0-a2b9-aff2b489910c": "In Progress",
+      "1a0af7b2-a7b5-4556-a265-ff9c3b185eee": "Ready to Test",
+      "e0b5c7a8-7f75-4b89-91df-4dc9a51ecc0d": "TODO-confirm",
+      "5c697569-22e9-4bf3-b743-f30306ca4b42": "Reopened",
+      "d110df09-0568-40ee-a58d-c4fd43bf3c44": "TODO-confirm",
+      "d7f73a9e-e96d-4f64-836d-28adb490cd54": "Ready to Release Master"
+    }
+  },
+
+  "project": {
+    "field_name": "Project",
+    "field_guid": "67d023b0-948b-47d0-9373-a5be793f8b0b",
+    "labels": {
+      "a27ff85d-deed-46eb-baff-4c72849b3f43": "Core",
+      "acfa2257-3bcb-4082-a21b-902d44060cd8": "TODO-confirm",
+      "000480d6-3d6c-474b-b61c-778608ca5a40": "TODO-confirm",
+      "639f9007-fba4-4cfe-b029-a787e2781be1": "TODO-confirm",
+      "09e2875f-09a0-4e66-af46-f4ab1f632fd4": "TODO-confirm",
+      "b5e441ca-c1eb-4547-8d64-be7fb2cb07a4": "TODO-confirm",
+      "6a3e47f3-3e65-424f-8629-0b83c0bb1b11": "TODO-confirm"
+    }
+  },
+
+  "task_type": {
+    "field_name": "Task Type",
+    "field_guid": "53981ed7-8fd7-4c22-97b9-1e51cca10280",
+    "labels": {
+      "ebcf61cd-1dbf-488c-ab60-51a50ae0debe": "Improvement",
+      "ba9da434-cd63-49af-b84b-63e739c33804": "Task",
+      "539a12fe-a1ca-45f7-a61a-b69d093fe2cb": "Feature",
+      "923d7f06-3b49-4eae-86ef-b95ea45d6b50": "Bug",
+      "f54307ae-0daf-4c5d-88a0-da732af395c7": "Golang Refactor"
+    },
+    "known_labels": ["Bug", "Improvement", "Task", "Feature", "User Story", "Golang Refactor"],
+    "_note": "4 of 6 known labels observed in 90 open tasks. User Story and Golang Refactor exist in the Lark field but no current open task uses them. Best-guess mappings based on task content patterns — confirm by opening any task in Lark."
+  },
+
+  "priority": {
+    "field_name": "Priority",
+    "field_guid": "4f13bcac-3feb-4282-8235-64bc0e47a621",
+    "labels": {
+      "d7aff674-0ef8-6397-9108-fb260e21bde9": "TODO-confirm-high",
+      "6238286f-b2e2-5ab8-e902-a3bb9dc242b0": "TODO-confirm-medium"
+    },
+    "sort_order": [
+      "d7aff674-0ef8-6397-9108-fb260e21bde9",
+      "6238286f-b2e2-5ab8-e902-a3bb9dc242b0"
+    ],
+    "_note": "sort_order lists priority IDs from highest to lowest. Two IDs observed in the live data (11 vs 21 tasks) — the less common one (d7aff674…) is assumed to be the explicitly-elevated High priority; the more common (6238286f…) is assumed to be the default Medium. Confirm by opening one sample task per ID in Lark and edit labels."
+  },
+
+  "user_map": {
+    "ou_372382a77bb03230895c85ab6e26f420": "Baihaqi Salman",
+    "ou_817d433e0fec85efd8c038f87b718fc6": "Frans Marbun",
+    "ou_950940f99e5691fedfa0a01a9ed4c742": "Fatan Aminullah",
+    "ou_a749885b0bd309a933fd858ce3a8243c": "Deddy Prabowo",
+    "ou_a673404f56aaf9dd5625666477766ea1": "Mohamad Tobiin",
+    "ou_d67f60436cfa128ee332c5c772c4aea7": "Febrian Dani",
+    "ou_e9d05fc11793b13ea53bb9edb2651116": "Gian Arifin",
+    "ou_f0b3a39992de7f92c8d514f557ef663a": "Ilham Shiddiq",
+    "ou_fa6e849a675f1c2b3123ae05ae428f2d": "Dani Fadli",
+    "_note": "Cache of assignee open_id → display name. Skill writes new entries on cache miss via `lark-cli contact +get-user`."
+  }
+}
