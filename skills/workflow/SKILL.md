@@ -36,9 +36,10 @@ Show ALL active features with their phases.
 ### `/workflow start <slug>`
 Start a new workflow. **Auto-routes by Task Type** between two tracks:
 
-- **Feature** / **User Story** → full track (PRD → wireframe → split → impl → PR)
+- **Feature** / **User Story** → full track (PRD → split → impl → PR;
+  wireframe is optional, only when the feature needs new UI screens)
 - **Bug** / **Improvement** / **Task** / **Golang Refactor** → small track
-  (impl → PR only, no PRD/wireframe/split)
+  (impl → PR only, no PRD, no split)
 
 **Flags:**
 - `--type=feature` — force full track (default if no Lark task is linked)
